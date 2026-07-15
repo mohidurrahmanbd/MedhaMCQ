@@ -14,31 +14,6 @@
 </head>
 <body>
 
-    <!-- ਫਾਇਰਬੇਸ ਕਨੈਕਸ਼ਨ ਸਕ੍ਰਿਪਟ (ফায়ারবেস SDK v9 মডিউল) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
-        // !!! এখানে আপনার ফায়ারবেস কনসোল থেকে পাওয়া কি (Keys) গুলো বসাবেন !!!
-        
-
-        // ফায়ারবেস সচল করা
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // গ্লোবাল উইন্ডোতে অবজেক্টগুলো যুক্ত করা যাতে সাধারণ স্ক্রিপ্ট থেকে অ্যাক্সেস করা যায়
-        window.db = db;
-        window.collection = collection;
-        window.addDoc = addDoc;
-        window.getDocs = getDocs;
-        window.query = query;
-        window.orderBy = orderBy;
-        window.limit = limit;
-
-        // অ্যাপ চালু হওয়া মাত্রই ফায়ারবেস থেকে লাইভ প্রশ্ন লোড হবে
-        fetchLiveQuestions();
-    </script>
-
     <div class="app-container flex flex-col justify-between p-6 relative">
         
         <!-- ================= LOGIN SCREEN ================= -->
@@ -170,7 +145,7 @@
                 <div class="flex justify-around my-4 text-sm font-semibold">
                     <span class="text-green-600">✅ সঠিক: <span id="correct-count">০</span></span>
                     <span class="text-red-600">❌ ভুল: <span id="wrong-count">০</span></span>
-                    <span class="text-orange-600">📉 নেগেটিভ: <span id="negative-count">০</span></span>
+                    <span class="text-orange-600">📉 নেগেティブ: <span id="negative-count">০</span></span>
                 </div>
 
                 <div class="w-36 h-36 mx-auto my-2">
@@ -196,7 +171,26 @@
     </div>
 
     <!-- ================= APP LOGIC (JAVASCRIPT) ================= -->
-    <script>
+    <!-- ফায়ারবেস স্ক্রিপ্ট মডিউল হিসেবে লোড করে সব লজিক এর মধ্যে রাখা হয়েছে -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // !!! এখানে আপনার ফায়ারবেস কনসোল থেকে পাওয়া কি (Keys) গুলো বসাবেন !!!
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // ফায়ারবেস সচল করা
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // গ্লোবাল ভেরিয়েবল সমূহ
         let questions = [];
         let currentQuestionIndex = 0;
         let score = 0;
@@ -206,17 +200,13 @@
         let answered = false;
         let chartInstance = null;
         
-        // আপনার গোপন এডমিন পাসওয়ার্ড (এটি পরিবর্তন করে নিতে পারেন)
+        // আপনার গোপন এডমিন পাসওয়ার্ড
         const ADMIN_PASSWORD = "admin123"; 
 
         // ১. ফায়ারবেস ফায়ারস্টোর থেকে লাইভ প্রশ্ন সংগ্রহ করা
         async function fetchLiveQuestions() {
-            if (!window.db) {
-                setTimeout(fetchLiveQuestions, 500);
-                return;
-            }
             try {
-                const querySnapshot = await window.getDocs(window.collection(window.db, "questions"));
+                const querySnapshot = await getDocs(collection(db, "questions"));
                 questions = [];
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
@@ -239,18 +229,18 @@
         }
 
         // ২. এডমিন লগইন লজিক
-        function showAdminLogin() {
+        window.showAdminLogin = function() {
             document.getElementById("login-screen").classList.add("hidden");
             document.getElementById("admin-login-screen").classList.remove("hidden");
         }
 
-        function backToLogin() {
+        window.backToLogin = function() {
             document.getElementById("admin-login-screen").classList.add("hidden");
             document.getElementById("admin-dashboard").classList.add("hidden");
             document.getElementById("login-screen").classList.remove("hidden");
         }
 
-        function verifyAdmin() {
+        window.verifyAdmin = function() {
             const pass = document.getElementById("admin-pass-input").value;
             if (pass === ADMIN_PASSWORD) {
                 document.getElementById("admin-login-screen").classList.add("hidden");
@@ -261,7 +251,7 @@
         }
 
         // ৩. এডমিন প্যানেল থেকে সরাসরি ফায়ারবেসে প্রশ্ন পাঠানো
-        async function submitQuestionToFirebase() {
+        window.submitQuestionToFirebase = async function() {
             const text = document.getElementById("adm-q-text").value.trim();
             const optionA = document.getElementById("adm-opt-a").value.trim();
             const optionB = document.getElementById("adm-opt-b").value.trim();
@@ -277,7 +267,7 @@
             }
 
             try {
-                await window.addDoc(window.collection(window.db, "questions"), {
+                await addDoc(collection(db, "questions"), {
                     text, optionA, optionB, optionC, optionD, correct, explanation, category,
                     createdAt: new Date()
                 });
@@ -299,7 +289,7 @@
         }
 
         // ৪. ইউজার কুইজ ফাংশনসমূহ
-        function loginUser() {
+        window.loginUser = function() {
             const username = document.getElementById("username-input").value.trim();
             if (!username) { alert("দয়া করে আপনার নাম লিখুন!"); return; }
             if (questions.length === 0) { 
@@ -373,7 +363,7 @@
             document.getElementById("next-btn").classList.remove("hidden");
         }
 
-        function nextQuestion() {
+        window.nextQuestion = function() {
             if (currentQuestionIndex < questions.length - 1) {
                 currentQuestionIndex++;
                 loadQuestion();
@@ -396,29 +386,27 @@
 
             renderChart(correctAnswers, wrongAnswers);
 
-            if (window.db) {
-                try {
-                    await window.addDoc(window.collection(window.db, "leaderboard"), {
-                        name: currentUser,
-                        score: finalScore,
-                        date: new Date()
-                    });
-                    loadGlobalLeaderboard();
-                } catch (e) {
-                    console.error("স্কোর সেভ করা যায়নি:", e);
-                }
+            try {
+                await addDoc(collection(db, "leaderboard"), {
+                    name: currentUser,
+                    score: finalScore,
+                    date: new Date()
+                });
+                loadGlobalLeaderboard();
+            } catch (e) {
+                console.error("স্কোর সেভ করা যায়নি:", e);
             }
         }
 
         async function loadGlobalLeaderboard() {
             const listContainer = document.getElementById("leaderboard-list");
             try {
-                const q = window.query(
-                    window.collection(window.db, "leaderboard"),
-                    window.orderBy("score", "desc"),
-                    window.limit(10)
+                const q = query(
+                    collection(db, "leaderboard"),
+                    orderBy("score", "desc"),
+                    limit(10)
                 );
-                const querySnapshot = await window.getDocs(q);
+                const querySnapshot = await getDocs(q);
                 listContainer.innerHTML = "";
 
                 let index = 0;
@@ -468,7 +456,7 @@
             });
         }
 
-        function restartQuiz() {
+        window.restartQuiz = function() {
             currentQuestionIndex = 0;
             score = 0;
             correctAnswers = 0;
@@ -477,6 +465,9 @@
             document.getElementById("quiz-screen").classList.remove("hidden");
             loadQuestion();
         }
+
+        // অ্যাপ চালু হওয়া মাত্রই ফায়ারবেস থেকে লাইভ প্রশ্ন লোড হবে
+        fetchLiveQuestions();
     </script>
 </body>
 </html>
