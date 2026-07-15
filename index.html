@@ -171,19 +171,18 @@
     </div>
 
     <!-- ================= APP LOGIC (JAVASCRIPT) ================= -->
-    <!-- ফায়ারবেস স্ক্রিপ্ট মডিউল হিসেবে লোড করে সব লজিক এর মধ্যে রাখা হয়েছে -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-        // !!! এখানে আপনার ফায়ারবেস কনসোল থেকে পাওয়া কি (Keys) গুলো বসাবেন !!!
+        // আপনার প্রদানকৃত ফায়ারবেস কনফিগারেশন সরাসরি যুক্ত করা হয়েছে
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+          apiKey: "AIzaSyDixdU2I4Zlfl5sSxg0KA5aAIvUHw0ljVM",
+          authDomain: "medhamcq.firebaseapp.com",
+          projectId: "medhamcq",
+          storageBucket: "medhamcq.firebasestorage.app",
+          messagingSenderId: "445503150824",
+          appId: "1:445503150824:web:6d2465d6e15640a69b075d"
         };
 
         // ফায়ারবেস সচল করা
