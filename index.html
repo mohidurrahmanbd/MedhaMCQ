@@ -342,7 +342,7 @@
                             <span class="text-base">📢</span>
                             <h4 class="font-bold text-amber-800 text-xs">গুরুত্বপূর্ণ নোটিশ</h4>
                         </div>
-                        <p id="db-notice-text" class="text-gray-705 text-[11px] leading-relaxed whitespace-pre-line"></p>
+                        <p id="db-notice-text" class="text-gray-700 text-[11px] leading-relaxed whitespace-pre-line"></p>
                     </div>
 
                     <!-- ড্যাশবোর্ড লাইভ এক্সাম বক্স -->
@@ -354,7 +354,7 @@
                             </div>
                             <span class="bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full animate-pulse font-semibold">LIVE</span>
                         </div>
-                        <p id="db-exam-desc" class="text-gray-650 text-[10px] mb-2"></p>
+                        <p id="db-exam-desc" class="text-gray-600 text-[10px] mb-2"></p>
                         <button onclick="goToLiveExamZone()" class="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold py-1.5 px-3 rounded-lg shadow transition">
                             পরীক্ষায় অংশ নিন ➔
                         </button>
@@ -399,7 +399,7 @@
                         <span class="text-[10px] text-gray-500 block">গড় স্কোর</span>
                         <span id="stat-avg-score" class="text-lg font-extrabold text-green-600">০</span>
                     </div>
-                    <div class="bg-amber-50 p-3 rounded-xl border border-amber-100 cursor-pointer">
+                    <div class="bg-amber-50 p-3 rounded-xl border border-amber-100 cursor-pointer" onclick="openBookmarkModal()">
                         <span class="text-[10px] text-gray-500 block">বুকমার্ক সমূহ</span>
                         <span id="stat-bookmarks" class="text-lg font-extrabold text-amber-600">০</span>
                     </div>
@@ -479,7 +479,7 @@
 
                 <div id="official-live-exam-box" class="hidden bg-emerald-50 border border-emerald-100 p-4 rounded-2xl text-center mb-4">
                     <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1 rounded-full">এডমিন নির্ধারিত পরীক্ষা</span>
-                    <h3 id="official-exam-title" class="text-base font-bold text-emerald-950 mt-2">লোড হচ্ছে...</h3>
+                    <h3 id="official-exam-title" class="text-base font-bold text-emerald-950 mt-2">로드 হচ্ছে...</h3>
                     <p id="official-exam-desc" class="text-xs text-emerald-700 mt-1">সময়: - মিনিট | প্রশ্ন: - টি</p>
                     <button onclick="startOfficialLiveQuiz()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs mt-3 shadow-md transition">
                         📝 পরীক্ষা দিন
@@ -612,7 +612,7 @@
                     <h3 class="font-bold text-gray-800 text-sm">🔖 বুকমার্ক করা প্রশ্নসমূহ</h3>
                     <button onclick="closeBookmarkModal()" class="text-gray-400 text-lg hover:text-gray-600">✕</button>
                 </div>
-                <div id="bookmark-list-container" class="overflow-y-auto flex-grow divide-y divide-gray-100 text-xs"></div>
+                <div id="bookmark-list-container" class="overflow-y-auto flex-grow divide-y divide-gray-100 text-xs text-gray-700"></div>
             </div>
         </div>
 
@@ -699,6 +699,58 @@
         let totalSecondsRemaining = 0;
 
         const ADMIN_PASSWORD = "admin123"; 
+
+        // Auto Login System on DOM Content Loaded
+        window.addEventListener("DOMContentLoaded", async () => {
+            const savedPhone = localStorage.getItem("userPhone");
+            const savedRole = localStorage.getItem("userRole");
+
+            if (savedPhone && savedRole) {
+                currentUserPhone = savedPhone;
+                if (savedRole === "admin") {
+                    document.getElementById("login-screen").classList.add("hidden");
+                    document.getElementById("admin-dashboard").classList.remove("hidden");
+                    await fetchLiveQuestions();
+                    renderAdminQuestionList();
+                } else {
+                    // Fetch user details and login
+                    try {
+                        const userRef = doc(db, "users", savedPhone);
+                        const userSnap = await getDoc(userRef);
+                        if (userSnap.exists()) {
+                            const userData = userSnap.data();
+                            currentUser = userData.name;
+                            
+                            document.getElementById("portal-username").innerText = currentUser;
+                            document.getElementById("user-display").innerText = currentUser;
+                            document.getElementById("drawer-user-name").innerText = currentUser;
+                            document.getElementById("drawer-user-phone").innerText = currentUserPhone;
+                            
+                            const avatarUrl = userData.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${savedPhone}`;
+                            document.getElementById("drawer-avatar").src = avatarUrl;
+                            document.getElementById("portal-avatar").src = avatarUrl;
+                            document.getElementById("info-avatar").src = avatarUrl;
+                            
+                            document.getElementById("info-name").innerText = `নাম: ${currentUser}`;
+                            document.getElementById("info-phone").innerText = `মোবাইল: ${currentUserPhone}`;
+                            document.getElementById("info-gender").innerText = `লিঙ্গ: ${userData.gender || 'উল্লেখ নেই'}`;
+                            document.getElementById("info-education").innerText = `শিক্ষা: ${userData.education || 'উল্লেখ নেই'}`;
+                            
+                            document.getElementById("login-screen").classList.add("hidden");
+                            document.getElementById("user-portal").classList.remove("hidden");
+                            
+                            switchDrawerSection('profile'); 
+                            await fetchLiveQuestions();
+                            await loadUserDashboardData();
+                        }
+                    } catch (e) {
+                        console.error("Auto login failed:", e);
+                    }
+                }
+            } else {
+                await fetchLiveQuestions();
+            }
+        });
 
         // Global UI navigation triggers
         window.toggleDrawer = function(open) {
@@ -815,6 +867,10 @@
                 currentUser = userData.name;
                 currentUserPhone = phone;
 
+                // Save session in LocalStorage
+                localStorage.setItem("userPhone", phone);
+                localStorage.setItem("userRole", "user");
+
                 document.getElementById("portal-username").innerText = currentUser;
                 document.getElementById("user-display").innerText = currentUser;
                 document.getElementById("drawer-user-name").innerText = currentUser;
@@ -844,7 +900,10 @@
         window.logoutUser = function() {
             currentUser = "";
             currentUserPhone = "";
+            localStorage.removeItem("userPhone");
+            localStorage.removeItem("userRole");
             document.getElementById("user-portal").classList.add("hidden");
+            document.getElementById("admin-dashboard").classList.add("hidden");
             document.getElementById("login-screen").classList.remove("hidden");
             document.getElementById("login-password").value = "";
         }
@@ -1004,6 +1063,8 @@
         window.verifyAdmin = function() {
             const pass = document.getElementById("admin-pass-input").value;
             if (pass === ADMIN_PASSWORD) {
+                localStorage.setItem("userPhone", "admin_portal");
+                localStorage.setItem("userRole", "admin");
                 document.getElementById("admin-login-screen").classList.add("hidden");
                 document.getElementById("admin-dashboard").classList.remove("hidden");
                 renderAdminQuestionList();
@@ -1843,12 +1904,12 @@
         window.openBookmarkModal = async function() {
             document.getElementById("bookmark-modal").classList.remove("hidden");
             const listContainer = document.getElementById("bookmark-list-container");
-            listContainer.innerHTML = `<p class="text-center text-gray-400 py-4">বুকমার্ক লোড হচ্ছে...</p>`;
+            listContainer.innerHTML = `<p class="text-center text-xs text-gray-400 py-4">বুকমার্ক লোড হচ্ছে...</p>`;
 
             try {
                 const qSnap = await getDocs(query(collection(db, "bookmarks"), where("username", "==", currentUserPhone)));
                 if (qSnap.size === 0) {
-                    listContainer.innerHTML = `<p class="text-center text-gray-400 py-4">কোনো বুকমার্ক সংরক্ষিত নেই।</p>`;
+                    listContainer.innerHTML = `<p class="text-center text-xs text-gray-400 py-4">কোনো বুকমার্ক সংরক্ষিত নেই।</p>`;
                     return;
                 }
                 listContainer.innerHTML = "";
@@ -1857,7 +1918,7 @@
                     const bData = docSnap.data();
                     const fName = bData.folderName || "সাধারণ বুকমার্ক";
                     if(!groupedBookmarks[fName]) groupedBookmarks[fName] = [];
-                    const relatedQ = questions.find(q => q.id === bData.questionId);
+                    const relatedQ = questions.find(q => q.id.trim() === bData.questionId.trim());
                     if(relatedQ) {
                         groupedBookmarks[fName].push({
                             bookmarkDocId: docSnap.id,
@@ -1866,7 +1927,11 @@
                     }
                 });
 
+                let totalCount = 0;
                 for (const folder in groupedBookmarks) {
+                    if (groupedBookmarks[folder].length === 0) continue;
+                    totalCount++;
+                    
                     const groupDiv = document.createElement("div");
                     groupDiv.className = "mb-4 border border-indigo-100 rounded-xl p-3 bg-indigo-50/20";
                     groupDiv.innerHTML = `<h4 class="font-extrabold text-indigo-800 text-xs mb-2 border-b pb-1">📂 ${folder} (${groupedBookmarks[folder].length}টি প্রশ্ন)</h4>`;
@@ -1875,23 +1940,53 @@
 
                     groupedBookmarks[folder].forEach(q => {
                         const item = document.createElement("div");
-                        item.className = "py-2.5 flex flex-col gap-1";
+                        item.className = "py-2.5 flex flex-col gap-1 text-xs";
+                        
+                        let correctText = "";
+                        if(q.correct === "Option A") correctText = q.optionA;
+                        else if(q.correct === "Option B") correctText = q.optionB;
+                        else if(q.correct === "Option C") correctText = q.optionC;
+                        else if(q.correct === "Option D") correctText = q.optionD;
+
                         item.innerHTML = `
                             <div class="flex justify-between items-start gap-2">
-                                <span class="font-bold text-gray-800">${q.text}</span>
+                                <span class="font-bold text-gray-800 leading-snug">${q.text}</span>
                                 <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[9px] font-semibold shrink-0">${q.category}</span>
                             </div>
-                            <p class="text-gray-500 text-[10px] leading-relaxed">উত্তরের ব্যাখ্যা: ${q.explanation || 'ব্যাখ্যা নেই'}</p>
-                            <button onclick="removeBookmarkFromListDirect('${q.bookmarkDocId}')" class="text-rose-500 text-[9px] hover:underline self-end">রিমুভ করুন 🗑️</button>
+                            <div class="grid grid-cols-2 gap-1 my-1 text-[11px] text-gray-500">
+                                <div>ক) ${q.optionA}</div>
+                                <div>খ) ${q.optionB}</div>
+                                <div>গ) ${q.optionC}</div>
+                                <div>ঘ) ${q.optionD}</div>
+                            </div>
+                            <div class="bg-green-50/80 p-2 rounded-lg border border-green-100/50 mt-1">
+                                <p class="text-green-700 font-bold text-[11px]">✓ সঠিক উত্তর: ${correctText}</p>
+                                ${q.explanation ? `<p class="text-gray-600 text-[10px] leading-relaxed mt-1"><b class="text-amber-700">ব্যাখ্যা:</b> ${q.explanation}</p>` : ''}
+                            </div>
+                            <button onclick="removeBookmarkFromListDirect('${q.bookmarkDocId}')" class="text-rose-500 text-[10px] font-semibold hover:underline self-end mt-2">রিমুভ করুন 🗑️</button>
                         `;
                         qListDiv.appendChild(item);
                     });
                     groupDiv.appendChild(qListDiv);
                     listContainer.appendChild(groupDiv);
                 }
+
+                if(totalCount === 0) {
+                    listContainer.innerHTML = `<p class="text-center text-xs text-gray-400 py-4">কোনো বুকমার্ক পড়ার মতো প্রশ্ন পাওয়া যায়নি।</p>`;
+                }
             } catch (e) {
-                console.error(e);
+                console.error("বুকমার্ক লোড করতে সমস্যা:", e);
+                listContainer.innerHTML = `<p class="text-center text-red-500 text-xs py-4">লোড করার সময় ত্রুটি ঘটেছে!</p>`;
             }
+        }
+
+        window.closeBookmarkModal = function() {
+            document.getElementById("bookmark-modal").classList.add("hidden");
+        }
+
+        window.closeBookmarkFolderModal = function() {
+            document.getElementById("bookmark-folder-modal").classList.add("hidden");
+            tempBookmarkQId = null;
         }
 
         window.removeBookmarkFromListDirect = async function(bookmarkDocId) {
@@ -1899,10 +1994,10 @@
                 try {
                     await deleteDoc(doc(db, "bookmarks", bookmarkDocId));
                     alert("🗑️ বুকমার্ক সফলভাবে ডিলিট করা হয়েছে।");
-                    openBookmarkModal();
-                    loadUserDashboardData();
+                    await openBookmarkModal();
+                    await loadUserDashboardData();
                 } catch(e) {
-                    console.error(e);
+                    console.error("রিমুভ করতে সমস্যা:", e);
                 }
             }
         }
@@ -1975,8 +2070,6 @@
                 }
             }
         }
-
-        // --- NEW SYSTEMS FUNCTIONS ---
 
         async function loadAdminSettingsFields() {
             try {
@@ -2083,7 +2176,6 @@
                 else if(q.correct === "Option C") correctText = q.optionC;
                 else if(q.correct === "Option D") correctText = q.optionD;
 
-                // Create a secure trigger inside module block
                 const bmarkBtnId = `reader-bmark-btn-${q.id}`;
                 const isBookmarked = userBookmarks.includes(q.id);
                 
@@ -2109,7 +2201,6 @@
                 `;
                 container.appendChild(item);
 
-                // Attach dynamically safe click event listener inside modules if not already bookmarked
                 if (!isBookmarked) {
                     document.getElementById(bmarkBtnId).onclick = function() {
                         tempBookmarkFromReader(q.id);
@@ -2138,9 +2229,6 @@
                 if (targetSec) targetSec.classList.remove('hidden');
             }
         }
-
-        // Initialize App
-        fetchLiveQuestions();
     </script>
 </body>
 </html>
