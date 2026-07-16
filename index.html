@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>মেধা কুইজ - কাস্টম পরীক্ষা ও টাইমার ফিচার</title>
+    <title>মেধা কুইজ - প্রফেশনাল লাইভ এমসিকিউ এডিশন</title>
     <!-- Tailwind CSS, Chart.js এবং CSV/Excel পার্সার PapaParse -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -29,7 +29,6 @@
                 <p class="text-gray-500 text-sm mt-1">ব্যক্তিগত ড্যাশবোর্ড ও কাস্টমাইজড এক্সাম</p>
             </div>
             
-            <!-- লগইন ফর্ম -->
             <div class="w-full mt-4 flex flex-col gap-3">
                 <div>
                     <label class="block text-gray-600 text-sm font-medium mb-1">মোবাইল নম্বর</label>
@@ -116,7 +115,7 @@
             <div id="admin-add-tab" class="flex flex-col gap-4">
                 <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-150">
                     <h3 class="text-sm font-bold text-indigo-800 mb-1">📁 এক্সেল / CSV ফাইল আপলোড</h3>
-                    <p class="text-[11px] text-gray-500 mb-2 leading-relaxed">ফাইলের হেডার অবশ্যই এই নামে হতে হবে: <b class="text-indigo-700">text, optionA, optionB, optionC, optionD, correct, explanation, category</b></p>
+                    <p class="text-[11px] text-gray-500 mb-2 leading-relaxed">ফাইলের হেডার অবশ্যই এই নামে হতে হবে: <b class="text-indigo-700">text, optionA, optionB, optionC, optionD, correct, explanation, category, subCategory</b></p>
                     <div class="flex items-center gap-2">
                         <input type="file" id="excel-file-input" accept=".csv, .xlsx, .xls" class="block w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
                         <button onclick="uploadExcelQuestions()" class="bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-1.5 px-3 rounded-lg transition shrink-0">আপলোড</button>
@@ -161,16 +160,24 @@
                         <label class="block text-gray-600 mb-1 font-medium">ব্যাখ্যা (ঐচ্ছিক):</label>
                         <textarea id="adm-explain" rows="2" class="w-full px-3 py-2 border rounded-xl" placeholder="উত্তরটির সঠিক ব্যাখ্যা দিন..."></textarea>
                     </div>
-                    <div>
-                        <label class="block text-gray-600 mb-1 font-medium">ক্যাটাগরি তৈরি বা নির্বাচন করুন:</label>
-                        <div class="flex gap-2">
-                            <select id="adm-cat-select" onchange="toggleNewCategoryInput()" class="flex-grow px-3 py-2 border rounded-xl bg-white">
-                                <option value="সাধারণ জ্ঞান">সাধারণ জ্ঞান</option>
-                                <option value="ইংরেজি">ইংরেজি</option>
-                                <option value="বাংলা">বাংলা</option>
-                                <option value="NEW_CAT">➕ নতুন ক্যাটাগরি তৈরি করুন...</option>
-                            </select>
-                            <input type="text" id="adm-cat-new" placeholder="নতুন ক্যাটাগরির নাম" class="hidden flex-grow px-3 py-2 border rounded-xl">
+                    
+                    <!-- ক্যাটাগরি ও সাব-ক্যাটাগরি সেকশন -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-gray-600 mb-1 font-medium">প্রধান ক্যাটাগরি:</label>
+                            <div class="flex flex-col gap-1">
+                                <select id="adm-cat-select" onchange="toggleNewCategoryInput()" class="w-full px-3 py-2 border rounded-xl bg-white">
+                                    <option value="সাধারণ জ্ঞান">সাধারণ জ্ঞান</option>
+                                    <option value="ইংরেজি">ইংরেজি</option>
+                                    <option value="বাংলা">বাংলা</option>
+                                    <option value="NEW_CAT">➕ নতুন ক্যাটাগরি...</option>
+                                </select>
+                                <input type="text" id="adm-cat-new" placeholder="নতুন ক্যাটাগরির নাম" class="hidden w-full px-3 py-2 border rounded-xl mt-1">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 mb-1 font-medium">সাব-ক্যাটাগরি (টপিক):</label>
+                            <input type="text" id="adm-subcat-input" placeholder="যেমন: ব্যাকরণ / সাহিত্য" class="w-full px-3 py-2 border rounded-xl">
                         </div>
                     </div>
                     
@@ -256,8 +263,8 @@
                 <h3 class="text-xs font-bold text-gray-700">🎯 বিষয়ভিত্তিক অ্যানালিটিক্স</h3>
                 <div class="grid grid-cols-2 gap-3">
                     <div class="bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">
-                        <span class="text-[10px] text-emerald-800 font-bold block mb-1">🟢 স্ট্রং জোন (সবচেয়ে ভালো)</span>
-                        <p id="strong-zone-text" class="text-xs text-gray-700 font-medium">পর্যপ্ত ডেটা নেই</p>
+                        <span class="text-[10px] text-emerald-800 font-bold block mb-1">🟢 স্ট্রং জোন (সবচেয়ে ভালো)</span>
+                        <p id="strong-zone-text" class="text-xs text-gray-700 font-medium">পর্যাপ্ত ডেটা নেই</p>
                     </div>
                     <div class="bg-rose-50/50 p-3 rounded-xl border border-rose-100">
                         <span class="text-[10px] text-rose-800 font-bold block mb-1">🔴 উইক জোন (মনোযোগ দিন)</span>
@@ -266,12 +273,15 @@
                 </div>
             </div>
 
-            <!-- মূল অ্যাকশন বাটন -->
+            <!-- মূল অ্যাকশন বাটন সমূহ -->
             <button onclick="openSetupModal(false)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl text-sm shadow-md shadow-indigo-100 transition">
                 🚀 পরীক্ষা শুরু করুন
             </button>
             <button onclick="openSetupModal(true)" id="incorrect-rev-btn" class="hidden w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs transition">
                 ⚠️ ভুল করা প্রশ্নের ওপর পরীক্ষা দিন
+            </button>
+            <button onclick="openHistoryModal()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 rounded-xl text-xs transition shadow-sm">
+                📜 অতীত পরীক্ষার ওএমআর আর্কাইভ (History)
             </button>
         </div>
 
@@ -306,6 +316,16 @@
                     </select>
                 </div>
 
+                <!-- নেগেটিভ মার্কিং ডাইনামিক অপশন -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-2">৩. পরীক্ষার ধরন ও নেগেটিভ মার্কিং:</label>
+                    <select id="setup-negative-mark" class="w-full px-3 py-2 border rounded-xl bg-white text-sm">
+                        <option value="0.50">বিসিএস স্ট্যান্ডার্ড (-০.৫০)</option>
+                        <option value="0.25" selected>ব্যাংক ও অন্যান্য নিয়োগ (-০.২৫)</option>
+                        <option value="0.00">কোনো নেগেটিভ মার্ক নেই (০.০০)</option>
+                    </select>
+                </div>
+
                 <button onclick="startConfiguredQuiz()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-sm transition mt-2">
                     🎯 পরীক্ষা শুরু করুন
                 </button>
@@ -318,9 +338,9 @@
                 <div>
                     <span id="user-display" class="text-sm font-semibold text-indigo-600">ইউজার</span>
                     <h2 class="text-xs text-gray-400" id="category-display">সাধারণ জ্ঞান</h2>
+                    <span id="subcategory-display" class="text-[10px] text-gray-400 italic block"></span>
                 </div>
                 <div class="flex items-center gap-3">
-                    <!-- লাইভ টাইমার ডিসপ্লে -->
                     <div id="timer-display" class="bg-red-50 text-red-600 px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 border border-red-100">
                         ⏱️ <span id="timer-text">--:--</span>
                     </div>
@@ -342,7 +362,6 @@
 
             <div class="mt-6 flex flex-col gap-2">
                 <div class="flex gap-2 w-full">
-                    <!-- পরীক্ষা তাৎক্ষণিক শেষ করার বাটন -->
                     <button onclick="forceEndExam()" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3 px-4 rounded-xl text-xs transition border border-red-200 shrink-0">
                         🛑 পরীক্ষা শেষ করুন
                     </button>
@@ -363,7 +382,7 @@
                 <div class="flex justify-around my-4 text-sm font-semibold">
                     <span class="text-green-600">✅ সঠিক: <span id="correct-count">০</span></span>
                     <span class="text-red-600">❌ ভুল: <span id="wrong-count">০</span></span>
-                    <span class="text-orange-600">📉 নেগেтивного: <span id="negative-count">০</span></span>
+                    <span class="text-orange-600">📉 নেগেটিভ: <span id="negative-count">০</span></span>
                 </div>
 
                 <div class="w-32 h-32 mx-auto my-2">
@@ -394,6 +413,17 @@
             </div>
         </div>
 
+        <!-- ================= EXAM HISTORY OMR MODAL ================= -->
+        <div id="history-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-[480px] rounded-2xl p-5 flex flex-col gap-4 max-h-[80vh]">
+                <div class="flex justify-between items-center border-b pb-2">
+                    <h3 class="font-bold text-gray-800 text-sm">📜 আপনার পূর্ববর্তী পরীক্ষাসমূহ (OMR আর্কাইভ)</h3>
+                    <button onclick="closeHistoryModal()" class="text-gray-400 text-lg hover:text-gray-600">✕</button>
+                </div>
+                <div id="history-list-container" class="overflow-y-auto flex-grow divide-y divide-gray-100 text-xs"></div>
+            </div>
+        </div>
+
     </div>
 
     <!-- ================= APP LOGIC (JAVASCRIPT) ================= -->
@@ -419,8 +449,8 @@
         let correctAnswers = 0;
         let wrongAnswers = 0;
         
-        let currentUser = ""; // ব্যবহারকারীর নাম থাকবে
-        let currentUserPhone = ""; // ব্যবহারকারীর ফোন (Unique ID)
+        let currentUser = ""; 
+        let currentUserPhone = ""; 
 
         let answered = false;
         
@@ -434,13 +464,14 @@
 
         let userCategoryStats = {}; 
 
-        // টাইমার ভেরিয়েবল সমূহ
+        // টাইমার ও অ্যাডভান্সড সেটিংস ভেরিয়েবল
         let countdownTimer = null;
         let totalSecondsRemaining = 0;
+        let currentNegativeMarkRate = 0.25; 
+        let userSelectedAnswersLog = {}; 
 
         const ADMIN_PASSWORD = "admin123"; 
 
-        // রেজিস্টার এবং লগইন স্ক্রিন টগল করার লজিক
         window.toggleAuthScreens = function(screen) {
             if(screen === 'register') {
                 document.getElementById("login-screen").classList.add("hidden");
@@ -451,7 +482,6 @@
             }
         }
 
-        // নতুন ইউজার রেজিস্টার সিস্টেম
         window.registerUser = async function() {
             const name = document.getElementById("reg-name").value.trim();
             const phone = document.getElementById("reg-phone").value.trim();
@@ -467,7 +497,6 @@
             }
 
             try {
-                // চেক করা হচ্ছে মোবাইল নম্বর দিয়ে আগে অ্যাকাউন্ট খোলা আছে কিনা
                 const userRef = doc(db, "users", phone);
                 const userSnap = await getDoc(userRef);
 
@@ -476,7 +505,6 @@
                     return;
                 }
 
-                // নতুন ব্যবহারকারীর তথ্য আজীবন সংরক্ষণের জন্য ডাটাবেসে পুশ
                 await setDoc(userRef, {
                     name: name,
                     phone: phone,
@@ -496,7 +524,6 @@
             }
         }
 
-        // ইউজার লগইন সিস্টেম
         window.loginUser = async function() {
             const phone = document.getElementById("login-phone").value.trim();
             const password = document.getElementById("login-password").value.trim();
@@ -563,7 +590,8 @@
                         optionD: data.optionD,
                         correct: data.correct,
                         explanation: data.explanation || "",
-                        category: data.category || "সাধারণ জ্ঞান"
+                        category: data.category || "সাধারণ জ্ঞান",
+                        subCategory: data.subCategory || ""
                     };
                     questions.push(qObj);
                     if (qObj.category) categories.add(qObj.category);
@@ -666,6 +694,7 @@
             const optionD = document.getElementById("adm-opt-d").value.trim();
             const correct = document.getElementById("adm-correct").value;
             const explanation = document.getElementById("adm-explain").value.trim();
+            const subCategory = document.getElementById("adm-subcat-input").value.trim();
             
             let category = document.getElementById("adm-cat-select").value;
             if (category === "NEW_CAT") {
@@ -679,7 +708,7 @@
 
             try {
                 const questionData = {
-                    text, optionA, optionB, optionC, optionD, correct, explanation, category,
+                    text, optionA, optionB, optionC, optionD, correct, explanation, category, subCategory,
                     updatedAt: new Date()
                 };
 
@@ -722,7 +751,7 @@
 
                     const firstRow = importedData[0];
                     if (!firstRow.text || !firstRow.optionA || !firstRow.optionB || !firstRow.correct) {
-                        alert("ফাইলের ফরম্যাট ভুল! হেডারের নামগুলো সঠিকভাবে লেখা আছে কিনা তা যাচাই করুন (যেমন: text, optionA, optionB, correct)");
+                        alert("ফাইলের ফরম্যাট ভুল! হেডারের নামগুলো সঠিকভাবে লেখা আছে কিনা তা যাচাই করুন");
                         return;
                     }
 
@@ -739,6 +768,7 @@
                                 correct: row.correct ? row.correct.trim() : "Option A",
                                 explanation: row.explanation ? row.explanation.trim() : "",
                                 category: row.category ? row.category.trim() : "সাধারণ জ্ঞান",
+                                subCategory: row.subCategory ? row.subCategory.trim() : "",
                                 createdAt: new Date()
                             });
                             successCount++;
@@ -777,7 +807,7 @@
                 div.innerHTML = `
                     <div class="flex justify-between items-start gap-2">
                         <span class="font-bold text-gray-800 flex-grow">${q.text}</span>
-                        <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px] shrink-0">${q.category}</span>
+                        <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px] shrink-0">${q.category} ${q.subCategory ? '→ ' + q.subCategory : ''}</span>
                     </div>
                     <p class="text-gray-500 text-[11px]">A: ${q.optionA} | B: ${q.optionB} | C: ${q.optionC} | D: ${q.optionD}</p>
                     <div class="flex justify-between items-center mt-2 text-[11px]">
@@ -808,6 +838,7 @@
             document.getElementById("adm-opt-d").value = q.optionD;
             document.getElementById("adm-correct").value = q.correct;
             document.getElementById("adm-explain").value = q.explanation;
+            document.getElementById("adm-subcat-input").value = q.subCategory || "";
             
             document.getElementById("adm-cat-select").value = q.category;
             document.getElementById("adm-cat-new").classList.add("hidden");
@@ -846,6 +877,7 @@
             document.getElementById("adm-opt-c").value = "";
             document.getElementById("adm-opt-d").value = "";
             document.getElementById("adm-explain").value = "";
+            document.getElementById("adm-subcat-input").value = "";
             document.getElementById("adm-cat-new").value = "";
             document.getElementById("adm-cat-new").classList.add("hidden");
         }
@@ -855,7 +887,6 @@
 
         async function loadUserDashboardData() {
             try {
-                // আজীবন পারফরম্যান্স ডেটা লোড (ব্যবহারকারীর মোবাইল ট্যাগ ধরে)
                 const userSnap = await getDoc(doc(db, "users", currentUserPhone));
                 if (userSnap.exists()) {
                     const uData = userSnap.data();
@@ -874,7 +905,7 @@
                 document.getElementById("stat-bookmarks").innerText = userBookmarks.length;
 
                 const examSnap = await getDocs(
-                    query(collection(db, "leaderboard"), where("phone", "==", currentUserPhone), orderBy("date", "desc"))
+                    query(collection(db, "exam_history"), where("username", "==", currentUserPhone), orderBy("date", "desc"))
                 );
                 
                 let totalExams = examSnap.size;
@@ -916,7 +947,6 @@
 
         function calculateCategoryAnalytics() {
             userCategoryStats = {};
-
             categories.forEach(cat => {
                 userCategoryStats[cat] = { correct: 0, total: 0 };
             });
@@ -962,7 +992,6 @@
 
         function renderDashboardPerformanceChart() {
             const ctx = document.getElementById('dashboardChart').getContext('2d');
-            
             if (dashboardChartInstance) { dashboardChartInstance.destroy(); }
 
             let totalIncorrect = userIncorrectQuestions.length;
@@ -974,7 +1003,7 @@
             dashboardChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['সদস্য সঠিক অনুপাত', 'ভুল উত্তর ব্যাংক'],
+                    labels: ['সঠিক অনুপাত', 'ভুল উত্তর ব্যাংক'],
                     datasets: [{
                         label: 'প্রশ্নের পরিসংখ্যান',
                         data: [approximateCorrect, totalIncorrect],
@@ -996,7 +1025,7 @@
         }
 
 
-        // ================= NEW CUSTOM SETUP & TIMING FEATURES =================
+        // ================= CUSTOM SETUP & TIMING FEATURES =================
 
         window.openSetupModal = function(isRevisionMode = false) {
             isIncorrectRevisionMode = isRevisionMode;
@@ -1030,6 +1059,10 @@
         window.startConfiguredQuiz = function() {
             const limitVal = parseInt(document.getElementById("setup-q-limit").value);
             const timeLimitVal = document.getElementById("setup-time-limit").value;
+            const negVal = document.getElementById("setup-negative-mark").value;
+            
+            currentNegativeMarkRate = parseFloat(negVal); 
+            userSelectedAnswersLog = {}; 
 
             if (isIncorrectRevisionMode) {
                 const incorrectIds = userIncorrectQuestions.map(item => item.questionId);
@@ -1063,13 +1096,11 @@
 
             if (limitType === "unlimited") {
                 timerBox.innerHTML = "⏱️ আনলিমিটেড";
-                timerBox.classList.replace("text-red-600", "text-indigo-600");
-                timerBox.classList.replace("bg-red-50", "bg-indigo-50");
+                timerBox.className = "bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 border border-indigo-100";
                 return;
             }
 
-            timerBox.classList.replace("text-indigo-600", "text-red-600");
-            timerBox.classList.replace("bg-indigo-50", "bg-red-50");
+            timerBox.className = "bg-red-50 text-red-600 px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 border border-red-100";
 
             const minutes = parseInt(limitType);
             totalSecondsRemaining = minutes * 60;
@@ -1095,7 +1126,7 @@
         }
 
         window.forceEndExam = function() {
-            if (confirm("আপনি কি এখনই পরীক্ষাটি সমাপ্ত করতে চান? এই সময় পর্যন্ত দেওয়া সঠিক ও ভুল উত্তরের উপর ভিত্তি করে স্কোরবোর্ড তৈরি হবে।")) {
+            if (confirm("আপনি কি এখনই পরীক্ষাটি সমাপ্ত করতে চান? এর ওপর ভিত্তি করে স্কোরবোর্ড তৈরি হবে।")) {
                 if (countdownTimer) clearInterval(countdownTimer);
                 calculateAndSaveResult();
             }
@@ -1120,6 +1151,7 @@
 
             const q = activeQuizQuestions[currentQuestionIndex];
             document.getElementById("category-display").innerText = q.category;
+            document.getElementById("subcategory-display").innerText = q.subCategory ? `টপিক: ${q.subCategory}` : '';
             document.getElementById("question-counter").innerText = `${currentQuestionIndex + 1} / ${activeQuizQuestions.length}`;
             document.getElementById("question-text").innerText = q.text;
 
@@ -1191,6 +1223,14 @@
             const correctIndex = keys.indexOf(correctKey);
             const selectedIndex = keys.indexOf(selectedKey);
 
+            // ওএমআর ও উত্তর লগার
+            userSelectedAnswersLog[currentQ.id] = {
+                questionText: currentQ.text,
+                selected: selectedKey,
+                correct: correctKey,
+                isCorrect: selectedKey === correctKey
+            };
+
             if (correctIndex !== -1) {
                 buttons[correctIndex].classList.add("bg-green-100", "border-green-500", "text-green-800", "font-bold");
             }
@@ -1239,18 +1279,17 @@
             }
         }
 
-        // কুইজ রিপোর্ট প্রসেসিং এবং আজীবন ডেটা আপডেট লজিক
         async function calculateAndSaveResult() {
             document.getElementById("quiz-screen").classList.add("hidden");
             document.getElementById("result-screen").classList.remove("hidden");
 
-            const negativeMarks = wrongAnswers * 0.5;
+            const negativeMarks = wrongAnswers * currentNegativeMarkRate;
             const finalScore = (correctAnswers * 1) - negativeMarks;
 
             document.getElementById("correct-count").innerText = correctAnswers;
             document.getElementById("wrong-count").innerText = wrongAnswers;
-            document.getElementById("negative-count").innerText = negativeMarks;
-            document.getElementById("final-score").innerText = `প্রাপ্ত নম্বর: ${finalScore}`;
+            document.getElementById("negative-count").innerText = negativeMarks.toFixed(2);
+            document.getElementById("final-score").innerText = `প্রাপ্ত নম্বর: ${finalScore.toFixed(2)}`;
 
             renderResultChart(correctAnswers, wrongAnswers);
 
@@ -1259,11 +1298,11 @@
                 await addDoc(collection(db, "leaderboard"), {
                     name: currentUser,
                     phone: currentUserPhone,
-                    score: finalScore,
+                    score: parseFloat(finalScore.toFixed(2)),
                     date: new Date()
                 });
 
-                // ২. ব্যবহারকারীর আজীবন ট্র্যাকিং পরিসংখ্যান ফায়ারবেসে সরাসরি আপডেট বা প্লাস করা
+                // ২. আজীবন পরিসংখ্যান ফায়ারবেসে সরাসরি প্লাস করা
                 const userRef = doc(db, "users", currentUserPhone);
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
@@ -1276,6 +1315,18 @@
                         lifetimeWrong: (currentLifeData.lifetimeWrong || 0) + wrongAnswers
                     });
                 }
+
+                // ৩. ওএমআর আর্কাইভ বা এক্সাম হিস্ট্রি ফায়ারবেসে সেভ করা
+                await addDoc(collection(db, "exam_history"), {
+                    username: currentUserPhone,
+                    totalQuestions: activeQuizQuestions.length,
+                    correct: correctAnswers,
+                    wrong: wrongAnswers,
+                    score: parseFloat(finalScore.toFixed(2)),
+                    negativeRate: currentNegativeMarkRate,
+                    answersLog: userSelectedAnswersLog, 
+                    date: new Date()
+                });
 
                 loadGlobalLeaderboard();
             } catch (e) {
@@ -1292,11 +1343,7 @@
         async function loadGlobalLeaderboard() {
             const listContainer = document.getElementById("leaderboard-list");
             try {
-                const q = query(
-                    collection(db, "leaderboard"),
-                    orderBy("score", "desc"),
-                    limit(10)
-                );
+                const q = query(collection(db, "leaderboard"), orderBy("score", "desc"), limit(10));
                 const querySnapshot = await getDocs(q);
                 listContainer.innerHTML = "";
 
@@ -1332,7 +1379,7 @@
             resultChartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['সটীক', 'ভুল'],
+                    labels: ['সঠিক', 'ভুল'],
                     datasets: [{
                         data: [correct, wrong],
                         backgroundColor: ['#22c55e', '#ef4444'],
@@ -1396,6 +1443,55 @@
             } catch (e) {
                 console.error(e);
             }
+        }
+
+
+        // ================= EXAM HISTORY OMR LOGIC =================
+
+        window.openHistoryModal = async function() {
+            document.getElementById("history-modal").classList.remove("hidden");
+            const container = document.getElementById("history-list-container");
+            container.innerHTML = `<p class="text-center text-gray-400 py-4">ইতিহাস লোড হচ্ছে...</p>`;
+
+            try {
+                const historySnap = await getDocs(
+                    query(collection(db, "exam_history"), where("username", "==", currentUserPhone), orderBy("date", "desc"))
+                );
+                
+                container.innerHTML = "";
+                if (historySnap.size === 0) {
+                    container.innerHTML = `<p class="text-center text-gray-400 py-4">এখনো কোনো পরীক্ষা দেওয়া হয়নি।</p>`;
+                    return;
+                }
+
+                historySnap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const examDate = data.date ? data.date.toDate().toLocaleDateString('bn-BD', {hour: '2-digit', minute:'2-digit'}) : 'অজানা সময়';
+                    
+                    const div = document.createElement("div");
+                    div.className = "py-3 flex flex-col gap-1 border-b last:border-none";
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-indigo-700">তারিখ: ${examDate}</span>
+                            <span class="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-[10px] font-bold">স্কোর: ${data.score}</span>
+                        </div>
+                        <p class="text-gray-600 text-[11px]">
+                            মোট প্রশ্ন: ${data.totalQuestions} টি | 
+                            সঠিক: <span class="text-green-600 font-bold">${data.correct}</span> | 
+                            ভুল: <span class="text-red-600 font-bold">${data.wrong}</span>
+                        </p>
+                        <p class="text-[10px] text-gray-400">নেগেটিভ মার্কিং হার ছিল: -${data.negativeRate}</p>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (e) {
+                console.error("হিস্ট্রি লোড করা যায়নি:", e);
+                container.innerHTML = `<p class="text-center text-red-500 py-4">ডেটা লোড করতে সমস্যা হয়েছে।</p>`;
+            }
+        }
+
+        window.closeHistoryModal = function() {
+            document.getElementById("history-modal").classList.add("hidden");
         }
 
         fetchLiveQuestions();
