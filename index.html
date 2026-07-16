@@ -334,6 +334,34 @@
             <!-- SUB SECTION A: প্রোফাইল ও ড্যাশবোর্ড -->
             <div id="drawer-sec-profile" class="flex flex-col gap-4 overflow-y-auto max-h-[82vh]">
                 
+                <!-- 📢 নোটিশ ও লাইভ এক্সাম বক্স (ড্যাশবোর্ড ইন্টিগ্রেশন) -->
+                <div class="grid grid-cols-1 gap-4 mb-2">
+                    <!-- ড্যাশবোর্ড নোটিশ বক্স -->
+                    <div id="db-notice-box" class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm hidden">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-base">📢</span>
+                            <h4 class="font-bold text-amber-800 text-xs">গুরুত্বপূর্ণ নোটিশ</h4>
+                        </div>
+                        <p id="db-notice-text" class="text-gray-705 text-[11px] leading-relaxed whitespace-pre-line"></p>
+                    </div>
+
+                    <!-- ড্যাশবোর্ড লাইভ এক্সাম বক্স -->
+                    <div id="db-live-exam-box" class="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 p-4 rounded-r-xl shadow-sm hidden">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <div class="flex items-center gap-2">
+                                <span class="text-base">⏱️</span>
+                                <h4 class="font-bold text-red-800 text-xs" id="db-exam-title">চলমান লাইভ পরীক্ষা</h4>
+                            </div>
+                            <span class="bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full animate-pulse font-semibold">LIVE</span>
+                        </div>
+                        <p id="db-exam-desc" class="text-gray-650 text-[10px] mb-2"></p>
+                        <button onclick="goToLiveExamZone()" class="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold py-1.5 px-3 rounded-lg shadow transition">
+                            পরীক্ষায় অংশ নিন ➔
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- প্রোফাইলের সাধারণ তথ্য -->
                 <div class="bg-white border rounded-2xl p-4 shadow-sm flex items-center gap-4">
                     <img id="info-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=default" class="w-16 h-16 rounded-full border-2 border-indigo-500 object-cover bg-gray-50 shadow" alt="Avatar">
                     <div class="text-xs flex flex-col gap-0.5 text-gray-600">
@@ -557,7 +585,7 @@
                 <div class="flex justify-around my-4 text-sm font-semibold">
                     <span class="text-green-600">✅ সঠিক: <span id="correct-count">০</span></span>
                     <span class="text-red-600">❌ ভুল: <span id="wrong-count">০</span></span>
-                    <span class="text-orange-600">📉 নেগেটিভ: <span id="negative-count">০</span></span>
+                    <span class="text-orange-600">📉 নেগেティブ: <span id="negative-count">০</span></span>
                 </div>
 
                 <div class="w-32 h-32 mx-auto my-2">
@@ -919,7 +947,7 @@
             
             filteredQuestions.forEach((q, idx) => {
                 const item = document.createElement("div");
-                item.className = "p-2.5 flex flex-col gap-1 hover:bg-white border-b border-gray-100 last:border-0 text-xs";
+                item.className = "p-2.5 flex flex-col gap-1 hover:bg-white border-b border-gray-100 last:border-0 text-xs relative";
                 
                 let correctText = "";
                 if(q.correct === "Option A") correctText = q.optionA;
@@ -927,8 +955,14 @@
                 else if(q.correct === "Option C") correctText = q.optionC;
                 else if(q.correct === "Option D") correctText = q.optionD;
 
+                const isBookmarked = userBookmarks.includes(q.id);
+                const bookmarkIndicator = isBookmarked 
+                    ? `<span class="absolute top-2.5 right-2 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">⭐ বুকমার্কড</span>` 
+                    : ``;
+
                 item.innerHTML = `
-                    <div class="font-bold text-gray-800 leading-snug">${idx + 1}. ${q.text}</div>
+                    <div class="font-bold text-gray-800 leading-snug pr-20">${idx + 1}. ${q.text}</div>
+                    ${bookmarkIndicator}
                     <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 mt-1 text-gray-500 text-[11px]">
                         <div>ক) ${q.optionA}</div>
                         <div>খ) ${q.optionB}</div>
@@ -1216,6 +1250,57 @@
                     document.getElementById("life-total-wrong").innerText = uData.lifetimeWrong || 0;
                 }
 
+                // নোটিশ ও লাইভ এক্সাম ডাটাবেস কনফিগ থেকে রিড করা
+                try {
+                    const settingsSnap = await getDoc(doc(db, "system_settings", "live_config"));
+                    if (settingsSnap.exists()) {
+                        const sysData = settingsSnap.data();
+                        
+                        const noticeText = sysData.notice ? sysData.notice.trim() : "";
+                        if (noticeText !== "") {
+                            document.getElementById("db-notice-box").classList.remove("hidden");
+                            document.getElementById("db-notice-text").innerText = noticeText;
+                            if(document.getElementById("user-notice-box")) {
+                                document.getElementById("user-notice-box").classList.remove("hidden");
+                                document.getElementById("user-notice-text").innerText = noticeText;
+                            }
+                        } else {
+                            document.getElementById("db-notice-box").classList.add("hidden");
+                            if(document.getElementById("user-notice-box")) {
+                                document.getElementById("user-notice-box").classList.add("hidden");
+                            }
+                        }
+                        
+                        const examTitle = sysData.examTitle ? sysData.examTitle.trim() : "";
+                        if (examTitle !== "") {
+                            officialExamConfig = sysData;
+                            const descText = `সময়: ${sysData.examTimeLimit || 0} মিনিট | প্রশ্ন: ${sysData.examQLimit || 0} টি | বিষয়: ${sysData.examCategory === 'ALL' ? 'সব বিষয়' : sysData.examCategory}`;
+                            
+                            document.getElementById("db-live-exam-box").classList.remove("hidden");
+                            document.getElementById("db-exam-title").innerText = examTitle;
+                            document.getElementById("db-exam-desc").innerText = descText;
+                            
+                            if(document.getElementById("official-live-exam-box")) {
+                                document.getElementById("official-live-exam-box").classList.remove("hidden");
+                                document.getElementById("official-exam-title").innerText = examTitle;
+                                document.getElementById("official-exam-desc").innerText = descText;
+                            }
+                        } else {
+                            document.getElementById("db-live-exam-box").classList.add("hidden");
+                            if(document.getElementById("official-live-exam-box")) {
+                                document.getElementById("official-live-exam-box").classList.add("hidden");
+                            }
+                        }
+                    } else {
+                        document.getElementById("db-notice-box").classList.add("hidden");
+                        document.getElementById("db-live-exam-box").classList.add("hidden");
+                        if(document.getElementById("user-notice-box")) document.getElementById("user-notice-box").classList.add("hidden");
+                        if(document.getElementById("official-live-exam-box")) document.getElementById("official-live-exam-box").classList.add("hidden");
+                    }
+                } catch (err) {
+                    console.error("কনফিগ লোড সমস্যা:", err);
+                }
+
                 const bookmarkSnap = await getDocs(
                     query(collection(db, "bookmarks"), where("username", "==", currentUserPhone))
                 );
@@ -1261,30 +1346,6 @@
                 calculateCategoryAnalytics();
                 renderDashboardPerformanceChart();
                 loadCategoryQuestionsForPrep();
-
-                // Load System / Notice config settings
-                try {
-                    const settingsSnap = await getDoc(doc(db, "system_settings", "live_config"));
-                    if (settingsSnap.exists()) {
-                        const sysData = settingsSnap.data();
-                        if(sysData.notice) {
-                            document.getElementById("user-notice-box").classList.remove("hidden");
-                            document.getElementById("user-notice-text").innerText = sysData.notice;
-                        } else {
-                            document.getElementById("user-notice-box").classList.add("hidden");
-                        }
-                        if(sysData.examTitle) {
-                            officialExamConfig = sysData;
-                            document.getElementById("official-live-exam-box").classList.remove("hidden");
-                            document.getElementById("official-exam-title").innerText = sysData.examTitle;
-                            document.getElementById("official-exam-desc").innerText = `সময়: ${sysData.examTimeLimit} মিনিট | প্রশ্ন: ${sysData.examQLimit} টি | ক্যাটাগরি: ${sysData.examCategory === 'ALL' ? 'সব বিষয়' : sysData.examCategory}`;
-                        } else {
-                            document.getElementById("official-live-exam-box").classList.add("hidden");
-                        }
-                    }
-                } catch (err) {
-                    console.error("কনফিগ লোড সমস্যা:", err);
-                }
 
             } catch (e) {
                 console.error("ড্যাশবোর্ড ডেটা লোড করার সময় ত্রুটি:", e);
@@ -1764,7 +1825,7 @@
             resultChartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['সঠিক', 'ভুল'],
+                    labels: ['সদস্য', 'ভুল'],
                     datasets: [{
                         data: [correct, wrong],
                         backgroundColor: ['#22c55e', '#ef4444'],
@@ -2024,13 +2085,16 @@
 
                 // Create a secure trigger inside module block
                 const bmarkBtnId = `reader-bmark-btn-${q.id}`;
+                const isBookmarked = userBookmarks.includes(q.id);
+                
+                const bookmarkButtonHtml = isBookmarked
+                    ? `<span class="text-amber-600 font-bold text-xs flex items-center gap-0.5 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">⭐ বুকমার্কড</span>`
+                    : `<button id="${bmarkBtnId}" class="text-indigo-600 hover:text-amber-500 transition font-medium text-xs shrink-0 flex items-center gap-0.5">🔖 বুকমার্ক</button>`;
 
                 item.innerHTML = `
                     <div class="flex justify-between items-start gap-2">
-                        <div class="font-bold text-sm text-gray-800 leading-snug">${idx + 1}. ${q.text}</div>
-                        <button id="${bmarkBtnId}" class="text-indigo-600 hover:text-amber-500 transition font-medium text-xs shrink-0 flex items-center gap-0.5">
-                            🔖 বুকমার্ক
-                        </button>
+                        <div class="font-bold text-sm text-gray-800 leading-snug pr-12">${idx + 1}. ${q.text}</div>
+                        ${bookmarkButtonHtml}
                     </div>
                     <div class="grid grid-cols-2 gap-2 mt-1 text-gray-600 text-xs">
                         <div class="p-2 bg-gray-50/50 rounded-lg border border-gray-100">ক) ${q.optionA}</div>
@@ -2045,10 +2109,12 @@
                 `;
                 container.appendChild(item);
 
-                // Attach dynamically safe click event listener inside modules
-                document.getElementById(bmarkBtnId).onclick = function() {
-                    tempBookmarkFromReader(q.id);
-                };
+                // Attach dynamically safe click event listener inside modules if not already bookmarked
+                if (!isBookmarked) {
+                    document.getElementById(bmarkBtnId).onclick = function() {
+                        tempBookmarkFromReader(q.id);
+                    };
+                }
             });
             document.getElementById("full-screen-reader").classList.remove("hidden");
         }
@@ -2063,9 +2129,18 @@
             document.getElementById("bookmark-folder-modal").classList.remove("hidden");
         }
 
+        window.goToLiveExamZone = function() {
+            if (typeof switchDrawerSection === 'function') {
+                switchDrawerSection('live-exam'); 
+            } else {
+                document.querySelectorAll('.drawer-sec').forEach(sec => sec.classList.add('hidden'));
+                const targetSec = document.getElementById('drawer-sec-live-exam');
+                if (targetSec) targetSec.classList.remove('hidden');
+            }
+        }
+
         // Initialize App
         fetchLiveQuestions();
-
     </script>
 </body>
 </html>
