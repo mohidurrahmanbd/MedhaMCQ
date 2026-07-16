@@ -162,9 +162,11 @@
 
             <div class="flex gap-2 border-b text-sm">
                 <button id="tab-add-btn" onclick="switchAdminTab('add')" class="flex-1 pb-2 border-b-2 border-indigo-600 font-semibold text-indigo-600">প্রশ্ন যোগ</button>
-                <button id="tab-manage-btn" onclick="switchAdminTab('manage')" class="flex-1 pb-2 border-b-2 border-transparent text-gray-500">প্রশ্ন ম্যানেজ ও ক্যাটাগরি</button>
+                <button id="tab-manage-btn" onclick="switchAdminTab('manage')" class="flex-1 pb-2 border-b-2 border-transparent text-gray-500">প্রশ্ন ম্যানেজ</button>
+                <button id="tab-exam-settings-btn" onclick="switchAdminTab('exam-settings')" class="flex-1 pb-2 border-b-2 border-transparent text-gray-500">পরীক্ষা ও নোটিশ সেটিংস</button>
             </div>
             
+            <!-- ADMIN ADD TAB -->
             <div id="admin-add-tab" class="flex flex-col gap-4">
                 <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-150">
                     <h3 class="text-sm font-bold text-indigo-800 mb-1">📁 এক্সেল / CSV ফাইল আপলোড</h3>
@@ -235,7 +237,7 @@
                 </div>
             </div>
 
-           <!-- ================= ADMIN MANAGE TAB ================= -->
+            <!-- ADMIN MANAGE TAB -->
             <div id="admin-manage-tab" class="hidden flex flex-col gap-4">
                 <div class="grid grid-cols-2 gap-2 text-xs">
                     <div>
@@ -273,8 +275,43 @@
                     <div id="admin-question-list" class="divide-y divide-gray-100"></div>
                 </div>
             </div>
-        </div>
 
+            <!-- ADMIN EXAM SETTINGS TAB -->
+            <div id="admin-exam-settings-tab" class="hidden flex flex-col gap-4 text-xs">
+                <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-150">
+                    <h3 class="text-sm font-bold text-indigo-800 mb-2">📢 নোটিশ বোর্ড আপডেট</h3>
+                    <textarea id="adm-notice-text" rows="2" class="w-full px-3 py-2 border rounded-xl" placeholder="শিক্ষার্থীদের জন্য নতুন কোনো আপডেট বা নোটিশ লিখুন..."></textarea>
+                    <button onclick="saveAdminNotice()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-xl mt-2 transition shadow">নোটিশ পাবলিশ করুন</button>
+                </div>
+
+                <div class="bg-amber-50 p-4 rounded-xl border border-amber-150">
+                    <h3 class="text-sm font-bold text-amber-900 mb-2">⏱️ অফিসিয়াল লাইভ এক্সাম সেট করুন</h3>
+                    <div class="flex flex-col gap-2">
+                        <div>
+                            <label class="block text-gray-700 mb-1 font-semibold">পরীক্ষার নাম/শিরোনাম:</label>
+                            <input type="text" id="adm-live-title" placeholder="যেমন: BCS প্রিলিমিনারি মডেল টেস্ট - ০১" class="w-full px-3 py-2 border rounded-xl bg-white text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-gray-700 mb-1 font-semibold">প্রশ্ন সংখ্যা:</label>
+                                <input type="number" id="adm-live-q-limit" placeholder="যেমন: ২০" class="w-full px-3 py-2 border rounded-xl bg-white text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-1 font-semibold">সময় (মিনিট):</label>
+                                <input type="number" id="adm-live-time-limit" placeholder="যেমন: ১৫" class="w-full px-3 py-2 border rounded-xl bg-white text-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-1 font-semibold">পরীক্ষার ক্যাটাগরি:</label>
+                            <select id="adm-live-category" class="w-full px-3 py-2 border rounded-xl bg-white text-sm">
+                                <option value="ALL">সব ক্যাটাগরি মিশিয়ে</option>
+                            </select>
+                        </div>
+                        <button onclick="saveLiveExamSettings()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl mt-2 transition shadow">🎯 লাইভ পরীক্ষা চালু করুন</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- ================= USER PORTAL CONTAINER ================= -->
         <div id="user-portal" class="hidden flex-grow flex flex-col gap-4">
@@ -334,9 +371,9 @@
                         <span class="text-[10px] text-gray-500 block">গড় স্কোর</span>
                         <span id="stat-avg-score" class="text-lg font-extrabold text-green-600">০</span>
                     </div>
-                    <div class="bg-amber-50 p-3 rounded-xl border border-amber-100 cursor-pointer" onclick="openBookmarkModal()">
+                    <div class="bg-amber-50 p-3 rounded-xl border border-amber-100 cursor-pointer">
                         <span class="text-[10px] text-gray-500 block">বুকমার্ক সমূহ</span>
-                        <span id="stat-bookmarks" class="text-lg font-extrabold text-amber-600">০ 🔖</span>
+                        <span id="stat-bookmarks" class="text-lg font-extrabold text-amber-600">০</span>
                     </div>
                 </div>
 
@@ -359,6 +396,9 @@
                         <select id="prep-cat-select" onchange="loadCategoryQuestionsForPrep()" class="w-full px-3 py-2 border border-gray-200 rounded-xl bg-white text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             <!-- ডায়নামিক ক্যাটাগরি লোড হবে -->
                         </select>
+                        <button onclick="openFullScreenReader()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow mt-3">
+                            📖 ফুল স্ক্রিন রিডার মোডে পড়ুন
+                        </button>
                     </div>
                     
                     <!-- প্রশ্ন প্রদর্শনের কন্টেইনার -->
@@ -403,6 +443,21 @@
 
             <!-- SUB SECTION C: লাইভ এক্সাম জোন -->
             <div id="drawer-sec-live-exam" class="hidden flex flex-col gap-4 overflow-y-auto max-h-[82vh]">
+                
+                <div id="user-notice-box" class="hidden bg-amber-50 border border-amber-200 p-4 rounded-2xl text-left mb-3">
+                    <span class="text-xs font-bold text-amber-800 flex items-center gap-1">📢 সর্বশেষ আপডেট/নোটিশ:</span>
+                    <p id="user-notice-text" class="text-xs text-gray-700 mt-1 leading-relaxed"></p>
+                </div>
+
+                <div id="official-live-exam-box" class="hidden bg-emerald-50 border border-emerald-100 p-4 rounded-2xl text-center mb-4">
+                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1 rounded-full">এডমিন নির্ধারিত পরীক্ষা</span>
+                    <h3 id="official-exam-title" class="text-base font-bold text-emerald-950 mt-2">লোড হচ্ছে...</h3>
+                    <p id="official-exam-desc" class="text-xs text-emerald-700 mt-1">সময়: - মিনিট | প্রশ্ন: - টি</p>
+                    <button onclick="startOfficialLiveQuiz()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs mt-3 shadow-md transition">
+                        📝 পরীক্ষা দিন
+                    </button>
+                </div>
+
                 <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl text-center">
                     <h3 class="text-base font-bold text-indigo-950">⏱️ কাস্টম এক্সাম ড্যাশবোর্ড</h3>
                     <p class="text-xs text-indigo-700 mt-1">প্রশ্ন সংখ্যা ও নির্দিষ্ট সময় নির্ধারণ করে লাইভ পরীক্ষায় অংশ নিন</p>
@@ -470,7 +525,7 @@
             </div>
 
             <div class="my-6">
-                <h3 id="question-text" class="text-lg font-bold text-gray-800 leading-snug">লোড হচ্ছে...</h3>
+                <h3 id="question-text" class="text-lg font-bold text-gray-800 leading-snug">로드 হচ্ছে...</h3>
             </div>
 
             <div class="flex flex-col gap-3" id="options-container"></div>
@@ -502,7 +557,7 @@
                 <div class="flex justify-around my-4 text-sm font-semibold">
                     <span class="text-green-600">✅ সঠিক: <span id="correct-count">০</span></span>
                     <span class="text-red-600">❌ ভুল: <span id="wrong-count">০</span></span>
-                    <span class="text-orange-600">📉 নেগেтивного: <span id="negative-count">০</span></span>
+                    <span class="text-orange-600">📉 নেগেটিভ: <span id="negative-count">০</span></span>
                 </div>
 
                 <div class="w-32 h-32 mx-auto my-2">
@@ -535,6 +590,43 @@
 
     </div>
 
+    <!-- বুকমার্ক ফোল্ডার সিলেকশন মডাল -->
+    <div id="bookmark-folder-modal" class="hidden fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-[360px] rounded-2xl p-5 flex flex-col gap-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-gray-800 text-sm">🔖 বুকমার্কের নাম দিন</h3>
+                <button onclick="closeBookmarkFolderModal()" class="text-gray-400 text-lg hover:text-gray-600">✕</button>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">বুকমার্ক গ্রুপ/ফোল্ডার নির্বাচন করুন:</label>
+                <select id="bookmark-folder-select" onchange="toggleNewFolderInput()" class="w-full px-3 py-2 border rounded-xl bg-white text-xs">
+                    <option value="সাধারণ বুকমার্ক">সাধারণ বুকমার্ক</option>
+                    <option value="NEW_FOLDER">➕ নতুন ফোল্ডার তৈরি করুন...</option>
+                </select>
+                <input type="text" id="new-folder-input" placeholder="ফোল্ডারের নাম (যেমন: কঠিন শব্দার্থ)" class="hidden w-full px-3 py-2 border rounded-xl mt-2 text-xs">
+            </div>
+            <button onclick="confirmSaveBookmark()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition">
+                সংরক্ষণ করুন
+            </button>
+        </div>
+    </div>
+
+    <!-- ফুল-স্ক্রিন রিডার মোড ওভারলে -->
+    <div id="full-screen-reader" class="hidden fixed inset-0 bg-white z-50 flex flex-col h-screen w-full">
+        <div class="p-4 bg-indigo-600 text-white flex justify-between items-center shadow-md">
+            <div>
+                <h2 id="reader-title" class="font-bold text-sm">প্রশ্ন ব্যাংক রিডার মোড</h2>
+                <span id="reader-subtitle" class="text-[10px] opacity-75">ক্যাটাগরি: -</span>
+            </div>
+            <button onclick="closeFullScreenReader()" class="bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition">
+                বন্ধ করুন ✕
+            </button>
+        </div>
+        <div class="flex-grow overflow-y-auto p-4 bg-gray-50">
+            <div id="reader-content-container" class="max-w-[480px] mx-auto space-y-4"></div>
+        </div>
+    </div>
+
     <!-- ================= APP LOGIC (JAVASCRIPT) ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
@@ -560,6 +652,8 @@
         
         let currentUser = ""; 
         let currentUserPhone = ""; 
+        let officialExamConfig = null;
+        let tempBookmarkQId = null;
 
         let answered = false;
         
@@ -578,7 +672,7 @@
 
         const ADMIN_PASSWORD = "admin123"; 
 
-        // Global functions mapped to window object for strict compatibility
+        // Global UI navigation triggers
         window.toggleDrawer = function(open) {
             const drawer = document.getElementById("nav-drawer");
             const overlay = document.getElementById("drawer-overlay");
@@ -639,7 +733,7 @@
             }
 
             try {
-                const userRef = doc(db, "questions_users", phone); // changed directory to questions_users to avoid conflicts if any
+                const userRef = doc(db, "users", phone);
                 const userSnap = await getDoc(userRef);
 
                 if (userSnap.exists()) {
@@ -887,20 +981,26 @@
         window.switchAdminTab = function(tabName) {
             const addTab = document.getElementById("admin-add-tab");
             const manageTab = document.getElementById("admin-manage-tab");
+            const settingsTab = document.getElementById("admin-exam-settings-tab");
+            
             const addBtn = document.getElementById("tab-add-btn");
             const manageBtn = document.getElementById("tab-manage-btn");
+            const settingsBtn = document.getElementById("tab-exam-settings-btn");
+
+            [addTab, manageTab, settingsTab].forEach(el => { if(el) el.classList.add("hidden"); });
+            [addBtn, manageBtn, settingsBtn].forEach(btn => { if(btn) btn.className = "flex-1 pb-2 border-b-2 border-transparent text-gray-500"; });
 
             if (tabName === 'add') {
-                addTab.classList.remove("hidden");
-                manageTab.classList.add("hidden");
-                addBtn.className = "flex-1 pb-2 border-b-2 border-indigo-600 font-semibold text-indigo-600";
-                manageBtn.className = "flex-1 pb-2 border-b-2 border-transparent text-gray-500";
-            } else {
-                addTab.classList.add("hidden");
-                manageTab.classList.remove("hidden");
-                addBtn.className = "flex-1 pb-2 border-b-2 border-transparent text-gray-500";
-                manageBtn.className = "flex-1 pb-2 border-b-2 border-indigo-600 font-semibold text-indigo-600";
+                if(addTab) addTab.classList.remove("hidden");
+                if(addBtn) addBtn.className = "flex-1 pb-2 border-b-2 border-indigo-600 font-semibold text-indigo-600";
+            } else if (tabName === 'manage') {
+                if(manageTab) manageTab.classList.remove("hidden");
+                if(manageBtn) manageBtn.className = "flex-1 pb-2 border-b-2 border-indigo-600 font-semibold text-indigo-600";
                 renderAdminQuestionList();
+            } else if (tabName === 'exam-settings') {
+                if(settingsTab) settingsTab.classList.remove("hidden");
+                if(settingsBtn) settingsBtn.className = "flex-1 pb-2 border-b-2 border-indigo-600 font-semibold text-indigo-600";
+                loadAdminSettingsFields();
             }
         }
 
@@ -1162,6 +1262,30 @@
                 renderDashboardPerformanceChart();
                 loadCategoryQuestionsForPrep();
 
+                // Load System / Notice config settings
+                try {
+                    const settingsSnap = await getDoc(doc(db, "system_settings", "live_config"));
+                    if (settingsSnap.exists()) {
+                        const sysData = settingsSnap.data();
+                        if(sysData.notice) {
+                            document.getElementById("user-notice-box").classList.remove("hidden");
+                            document.getElementById("user-notice-text").innerText = sysData.notice;
+                        } else {
+                            document.getElementById("user-notice-box").classList.add("hidden");
+                        }
+                        if(sysData.examTitle) {
+                            officialExamConfig = sysData;
+                            document.getElementById("official-live-exam-box").classList.remove("hidden");
+                            document.getElementById("official-exam-title").innerText = sysData.examTitle;
+                            document.getElementById("official-exam-desc").innerText = `সময়: ${sysData.examTimeLimit} মিনিট | প্রশ্ন: ${sysData.examQLimit} টি | ক্যাটাগরি: ${sysData.examCategory === 'ALL' ? 'সব বিষয়' : sysData.examCategory}`;
+                        } else {
+                            document.getElementById("official-live-exam-box").classList.add("hidden");
+                        }
+                    }
+                } catch (err) {
+                    console.error("কনফিগ লোড সমস্যা:", err);
+                }
+
             } catch (e) {
                 console.error("ড্যাশবোর্ড ডেটা লোড করার সময় ত্রুটি:", e);
             }
@@ -1403,8 +1527,8 @@
             const currentQ = activeQuizQuestions[currentQuestionIndex];
             const isBookmarked = userBookmarks.includes(currentQ.id);
 
-            try {
-                if (isBookmarked) {
+            if (isBookmarked) {
+                try {
                     const qSnap = await getDocs(
                         query(collection(db, "bookmarks"), where("username", "==", currentUserPhone), where("questionId", "==", currentQ.id))
                     );
@@ -1413,18 +1537,82 @@
                     });
                     userBookmarks = userBookmarks.filter(id => id !== currentQ.id);
                     alert("🔖 বুকমার্ক সরানো হয়েছে।");
-                } else {
-                    await addDoc(collection(db, "bookmarks"), {
-                        username: currentUserPhone,
-                        questionId: currentQ.id,
-                        date: new Date()
-                    });
-                    userBookmarks.push(currentQ.id);
-                    alert("⭐ বুকমার্ক তালিকায় সেভ করা হয়েছে!");
+                    loadQuestion();
+                } catch(e) {
+                    console.error(e);
                 }
+            } else {
+                tempBookmarkQId = currentQ.id;
+                loadBookmarkFoldersDropdown();
+                document.getElementById("bookmark-folder-modal").classList.remove("hidden");
+            }
+        }
+
+        async function loadBookmarkFoldersDropdown() {
+            const select = document.getElementById("bookmark-folder-select");
+            select.innerHTML = '<option value="সাধারণ বুকমার্ক">সাধারণ বুকমার্ক</option>';
+            try {
+                const qSnap = await getDocs(query(collection(db, "bookmarks"), where("username", "==", currentUserPhone)));
+                const folders = new Set();
+                qSnap.forEach(doc => {
+                    const folder = doc.data().folderName;
+                    if(folder && folder !== "সাধারণ বুকমার্ক") folders.add(folder);
+                });
+                folders.forEach(folder => {
+                    const opt = document.createElement("option");
+                    opt.value = opt.textContent = folder;
+                    select.appendChild(opt);
+                });
+            } catch(e) {
+                console.error(e);
+            }
+            const customOpt = document.createElement("option");
+            customOpt.value = "NEW_FOLDER";
+            customOpt.textContent = "➕ নতুন ফোল্ডার তৈরি করুন...";
+            select.appendChild(customOpt);
+            toggleNewFolderInput();
+        }
+
+        window.toggleNewFolderInput = function() {
+            const selectVal = document.getElementById("bookmark-folder-select").value;
+            const input = document.getElementById("new-folder-input");
+            if(selectVal === "NEW_FOLDER") {
+                input.classList.remove("hidden");
+                input.focus();
+            } else {
+                input.classList.add("hidden");
+                input.value = "";
+            }
+        }
+
+        window.closeBookmarkFolderModal = function() {
+            document.getElementById("bookmark-folder-modal").classList.add("hidden");
+            tempBookmarkQId = null;
+        }
+
+        window.confirmSaveBookmark = async function() {
+            if(!tempBookmarkQId) return;
+            let folderName = document.getElementById("bookmark-folder-select").value;
+            if(folderName === "NEW_FOLDER") {
+                folderName = document.getElementById("new-folder-input").value.trim();
+            }
+            if(!folderName) {
+                alert("দয়া করে বুকমার্ক ফোল্ডারের নামটি উল্লেখ করুন!");
+                return;
+            }
+            try {
+                await addDoc(collection(db, "bookmarks"), {
+                    username: currentUserPhone,
+                    questionId: tempBookmarkQId,
+                    folderName: folderName,
+                    date: new Date()
+                });
+                userBookmarks.push(tempBookmarkQId);
+                alert(`⭐ "${folderName}" এ সফলভাবে বুকমার্ক করা হয়েছে!`);
+                closeBookmarkFolderModal();
                 loadQuestion();
-            } catch (e) {
-                console.error("বুকমার্ক পরিবর্তন করা যায়নি:", e);
+            } catch(e) {
+                alert("বুকমার্ক সেভ করা যায়নি: " + e.message);
             }
         }
 
@@ -1596,46 +1784,65 @@
             const listContainer = document.getElementById("bookmark-list-container");
             listContainer.innerHTML = `<p class="text-center text-gray-400 py-4">বুকমার্ক লোড হচ্ছে...</p>`;
 
-            if (userBookmarks.length === 0) {
-                listContainer.innerHTML = `<p class="text-center text-gray-400 py-4">কোনো বুকমার্ক সংরক্ষিত নেই।</p>`;
-                return;
-            }
-
-            const bookmarkedQuestions = questions.filter(q => userBookmarks.includes(q.id));
-            listContainer.innerHTML = "";
-
-            bookmarkedQuestions.forEach(q => {
-                const item = document.createElement("div");
-                item.className = "py-3 flex flex-col gap-1";
-                item.innerHTML = `
-                    <div class="flex justify-between items-start gap-2">
-                        <span class="font-bold text-gray-800">${q.text}</span>
-                        <span class="bg-amber-50 text-amber-700 px-2 py-0.5 rounded text-[10px] font-semibold shrink-0">${q.category}</span>
-                    </div>
-                    <p class="text-gray-500 text-[11px]">উত্তরের ব্যাখ্যা: ${q.explanation || 'কোনো ব্যাখ্যা দেওয়া নেই'}</p>
-                    <button onclick="removeBookmarkFromList('${q.id}')" class="text-red-500 text-[10px] hover:underline self-end">রিমুভ করুন 🗑️</button>
-                `;
-                listContainer.appendChild(item);
-            });
-        }
-
-        window.closeBookmarkModal = function() {
-            document.getElementById("bookmark-modal").classList.add("hidden");
-        }
-
-        window.removeBookmarkFromList = async function(qId) {
             try {
-                const qSnap = await getDocs(
-                    query(collection(db, "bookmarks"), where("username", "==", currentUserPhone), where("questionId", "==", qId))
-                );
-                qSnap.forEach(async (docRef) => {
-                    await deleteDoc(doc(db, "bookmarks", docRef.id));
+                const qSnap = await getDocs(query(collection(db, "bookmarks"), where("username", "==", currentUserPhone)));
+                if (qSnap.size === 0) {
+                    listContainer.innerHTML = `<p class="text-center text-gray-400 py-4">কোনো বুকমার্ক সংরক্ষিত নেই।</p>`;
+                    return;
+                }
+                listContainer.innerHTML = "";
+                const groupedBookmarks = {};
+                qSnap.forEach(docSnap => {
+                    const bData = docSnap.data();
+                    const fName = bData.folderName || "সাধারণ বুকমার্ক";
+                    if(!groupedBookmarks[fName]) groupedBookmarks[fName] = [];
+                    const relatedQ = questions.find(q => q.id === bData.questionId);
+                    if(relatedQ) {
+                        groupedBookmarks[fName].push({
+                            bookmarkDocId: docSnap.id,
+                            ...relatedQ
+                        });
+                    }
                 });
-                userBookmarks = userBookmarks.filter(id => id !== qId);
-                document.getElementById("stat-bookmarks").innerText = userBookmarks.length;
-                openBookmarkModal(); 
+
+                for (const folder in groupedBookmarks) {
+                    const groupDiv = document.createElement("div");
+                    groupDiv.className = "mb-4 border border-indigo-100 rounded-xl p-3 bg-indigo-50/20";
+                    groupDiv.innerHTML = `<h4 class="font-extrabold text-indigo-800 text-xs mb-2 border-b pb-1">📂 ${folder} (${groupedBookmarks[folder].length}টি প্রশ্ন)</h4>`;
+                    const qListDiv = document.createElement("div");
+                    qListDiv.className = "divide-y divide-gray-100";
+
+                    groupedBookmarks[folder].forEach(q => {
+                        const item = document.createElement("div");
+                        item.className = "py-2.5 flex flex-col gap-1";
+                        item.innerHTML = `
+                            <div class="flex justify-between items-start gap-2">
+                                <span class="font-bold text-gray-800">${q.text}</span>
+                                <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[9px] font-semibold shrink-0">${q.category}</span>
+                            </div>
+                            <p class="text-gray-500 text-[10px] leading-relaxed">উত্তরের ব্যাখ্যা: ${q.explanation || 'ব্যাখ্যা নেই'}</p>
+                            <button onclick="removeBookmarkFromListDirect('${q.bookmarkDocId}')" class="text-rose-500 text-[9px] hover:underline self-end">রিমুভ করুন 🗑️</button>
+                        `;
+                        qListDiv.appendChild(item);
+                    });
+                    groupDiv.appendChild(qListDiv);
+                    listContainer.appendChild(groupDiv);
+                }
             } catch (e) {
                 console.error(e);
+            }
+        }
+
+        window.removeBookmarkFromListDirect = async function(bookmarkDocId) {
+            if(confirm("আপনি কি নিশ্চিতভাবে এটি বুকমার্ক তালিকা থেকে রিমুভ করতে চান?")) {
+                try {
+                    await deleteDoc(doc(db, "bookmarks", bookmarkDocId));
+                    alert("🗑️ বুকমার্ক সফলভাবে ডিলিট করা হয়েছে।");
+                    openBookmarkModal();
+                    loadUserDashboardData();
+                } catch(e) {
+                    console.error(e);
+                }
             }
         }
 
@@ -1706,6 +1913,154 @@
                     alert("ক্যাটাগরি পরিবর্তনের সময় সমস্যা হয়েছে: " + e.message);
                 }
             }
+        }
+
+        // --- NEW SYSTEMS FUNCTIONS ---
+
+        async function loadAdminSettingsFields() {
+            try {
+                const settingsSnap = await getDoc(doc(db, "system_settings", "live_config"));
+                if (settingsSnap.exists()) {
+                    const data = settingsSnap.data();
+                    document.getElementById("adm-notice-text").value = data.notice || "";
+                    document.getElementById("adm-live-title").value = data.examTitle || "";
+                    document.getElementById("adm-live-q-limit").value = data.examQLimit || "";
+                    document.getElementById("adm-live-time-limit").value = data.examTimeLimit || "";
+                    document.getElementById("adm-live-category").value = data.examCategory || "ALL";
+                }
+                const liveCatSelect = document.getElementById("adm-live-category");
+                liveCatSelect.innerHTML = '<option value="ALL">সব ক্যাটাগরি মিশিয়ে</option>';
+                categories.forEach(cat => {
+                    if(cat !== "NEW_CAT"){
+                        const opt = document.createElement("option");
+                        opt.value = opt.textContent = cat;
+                        liveCatSelect.appendChild(opt);
+                    }
+                });
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        window.saveAdminNotice = async function() {
+            const text = document.getElementById("adm-notice-text").value.trim();
+            try {
+                await setDoc(doc(db, "system_settings", "live_config"), { notice: text }, { merge: true });
+                alert("📢 নোটিশ বোর্ড সফলভাবে আপডেট করা হয়েছে!");
+            } catch(e) {
+                alert("ত্রুটি: " + e.message);
+            }
+        }
+
+        window.saveLiveExamSettings = async function() {
+            const title = document.getElementById("adm-live-title").value.trim();
+            const qLimit = parseInt(document.getElementById("adm-live-q-limit").value);
+            const timeLimit = parseInt(document.getElementById("adm-live-time-limit").value);
+            const category = document.getElementById("adm-live-category").value;
+
+            if(!title || !qLimit || !timeLimit) {
+                alert("পরীক্ষার সেটিংসের সব তথ্য সঠিকভাবে পূরণ করুন!");
+                return;
+            }
+            try {
+                await setDoc(doc(db, "system_settings", "live_config"), {
+                    examTitle: title,
+                    examQLimit: qLimit,
+                    examTimeLimit: timeLimit,
+                    examCategory: category
+                }, { merge: true });
+                alert("🎯 অফিসিয়াল কাস্টম পরীক্ষা সফলভাবে লাইভ করা হয়েছে!");
+            } catch(e) {
+                alert("ত্রুটি: " + e.message);
+            }
+        }
+
+        window.startOfficialLiveQuiz = function() {
+            if(!officialExamConfig) return;
+            let examQs = [...questions];
+            if (officialExamConfig.examCategory !== "ALL") {
+                examQs = examQs.filter(q => q.category === officialExamConfig.examCategory);
+            }
+            if(examQs.length < officialExamConfig.examQLimit) {
+                alert("পরীক্ষার জন্য পর্যাপ্ত প্রশ্ন প্রস্তুত নেই। এডমিনের সাথে যোগাযোগ করুন।");
+                return;
+            }
+            activeQuizQuestions = examQs.sort(() => 0.5 - Math.random()).slice(0, officialExamConfig.examQLimit);
+            document.getElementById("user-portal").classList.add("hidden");
+            document.getElementById("quiz-screen").classList.remove("hidden");
+            setupTimer(officialExamConfig.examTimeLimit.toString());
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+            wrongAnswers = 0;
+            loadQuestion();
+        }
+
+        window.openFullScreenReader = function() {
+            const prepSelect = document.getElementById("prep-cat-select");
+            const container = document.getElementById("reader-content-container");
+            if(!prepSelect || !container) return;
+            
+            const selectedCat = prepSelect.value;
+            const filteredQuestions = questions.filter(q => q.category === selectedCat);
+            
+            document.getElementById("reader-title").innerText = "বিষয়ভিত্তিক প্রশ্ন ব্যাংক রিডার";
+            document.getElementById("reader-subtitle").innerText = `ক্যাটাগরি: ${selectedCat}`;
+            container.innerHTML = "";
+            
+            if(filteredQuestions.length === 0) {
+                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-10">এই ক্যাটাগরিতে কোনো প্রশ্ন পাওয়া যায়নি।</p>`;
+                document.getElementById("full-screen-reader").classList.remove("hidden");
+                return;
+            }
+            
+            filteredQuestions.forEach((q, idx) => {
+                const item = document.createElement("div");
+                item.className = "p-5 bg-white border border-gray-100 rounded-2xl shadow-sm flex flex-col gap-2.5";
+                let correctText = "";
+                if(q.correct === "Option A") correctText = q.optionA;
+                else if(q.correct === "Option B") correctText = q.optionB;
+                else if(q.correct === "Option C") correctText = q.optionC;
+                else if(q.correct === "Option D") correctText = q.optionD;
+
+                // Create a secure trigger inside module block
+                const bmarkBtnId = `reader-bmark-btn-${q.id}`;
+
+                item.innerHTML = `
+                    <div class="flex justify-between items-start gap-2">
+                        <div class="font-bold text-sm text-gray-800 leading-snug">${idx + 1}. ${q.text}</div>
+                        <button id="${bmarkBtnId}" class="text-indigo-600 hover:text-amber-500 transition font-medium text-xs shrink-0 flex items-center gap-0.5">
+                            🔖 বুকমার্ক
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-1 text-gray-600 text-xs">
+                        <div class="p-2 bg-gray-50/50 rounded-lg border border-gray-100">ক) ${q.optionA}</div>
+                        <div class="p-2 bg-gray-50/50 rounded-lg border border-gray-100">খ) ${q.optionB}</div>
+                        <div class="p-2 bg-gray-50/50 rounded-lg border border-gray-100">গ) ${q.optionC}</div>
+                        <div class="p-2 bg-gray-50/50 rounded-lg border border-gray-100">ঘ) ${q.optionD}</div>
+                    </div>
+                    <div class="mt-2 flex flex-col gap-1 bg-green-50/60 p-3 rounded-xl border border-green-100/50">
+                        <span class="text-green-800 font-bold text-xs">✓ সঠিক উত্তর: ${correctText} (${q.correct})</span>
+                        ${q.explanation ? `<span class="text-gray-600 text-xs leading-relaxed border-t pt-1.5 mt-1.5"><b class="text-amber-800">ব্যাখ্যা:</b> ${q.explanation}</span>` : ''}
+                    </div>
+                `;
+                container.appendChild(item);
+
+                // Attach dynamically safe click event listener inside modules
+                document.getElementById(bmarkBtnId).onclick = function() {
+                    tempBookmarkFromReader(q.id);
+                };
+            });
+            document.getElementById("full-screen-reader").classList.remove("hidden");
+        }
+
+        window.closeFullScreenReader = function() {
+            document.getElementById("full-screen-reader").classList.add("hidden");
+        }
+
+        window.tempBookmarkFromReader = function(qId) {
+            tempBookmarkQId = qId;
+            loadBookmarkFoldersDropdown();
+            document.getElementById("bookmark-folder-modal").classList.remove("hidden");
         }
 
         // Initialize App
