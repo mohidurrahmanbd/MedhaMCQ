@@ -44,6 +44,9 @@
                     <button onclick="switchDrawerSection('live-exam')" id="nav-btn-live-exam" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition">
                         ⏱️ লাইভ এক্সাম জোন
                     </button>
+                    <button onclick="switchDrawerSection('user-results')" id="nav-btn-user-results" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition">
+                        📊 ফলাফল ও বিশ্লেষণ
+                    </button>
                 </div>
             </div>
             <!-- ড্রয়ার ফুটার -->
@@ -160,10 +163,11 @@
                 <button onclick="backToLogin()" class="bg-gray-800 text-white text-xs px-3 py-1 rounded-lg">লগআউট</button>
             </div>
 
-            <div class="flex gap-2 border-b text-sm">
+            <div class="flex gap-2 border-b text-xs">
                 <button id="tab-add-btn" onclick="switchAdminTab('add')" class="flex-1 pb-2 border-b-2 border-indigo-600 font-semibold text-indigo-600">প্রশ্ন যোগ</button>
                 <button id="tab-manage-btn" onclick="switchAdminTab('manage')" class="flex-1 pb-2 border-b-2 border-transparent text-gray-500">প্রশ্ন ম্যানেজ</button>
-                <button id="tab-exam-settings-btn" onclick="switchAdminTab('exam-settings')" class="flex-1 pb-2 border-b-2 border-transparent text-gray-500">পরীক্ষা ও নোটিশ সেটিংস</button>
+                <button id="tab-exam-settings-btn" onclick="switchAdminTab('exam-settings')" class="flex-1 pb-2 border-b-2 border-transparent text-gray-500">পরীক্ষা ও নোটিশ</button>
+                <button id="tab-exam-results-btn" onclick="switchAdminTab('exam-results')" class="flex-1 pb-2 border-b-2 border-transparent text-gray-500">মার্কস ভিউ</button>
             </div>
             
             <!-- ADMIN ADD TAB -->
@@ -280,12 +284,12 @@
             <div id="admin-exam-settings-tab" class="hidden flex flex-col gap-4 text-xs">
                 <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-150">
                     <h3 class="text-sm font-bold text-indigo-800 mb-2">📢 নোটিশ বোর্ড আপডেট</h3>
-                    <textarea id="adm-notice-text" rows="2" class="w-full px-3 py-2 border rounded-xl" placeholder="শিক্ষার্থীদের জন্য নতুন কোনো আপডেট বা নোটিশ লিখুন..."></textarea>
+                    <textarea id="adm-notice-text" rows="2" class="w-full px-3 py-2 border rounded-xl" placeholder=" can be notice..."></textarea>
                     <button onclick="saveAdminNotice()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-xl mt-2 transition shadow">নোটিশ পাবলিশ করুন</button>
                 </div>
 
                 <div class="bg-amber-50 p-4 rounded-xl border border-amber-150">
-                    <h3 class="text-sm font-bold text-amber-900 mb-2">⏱️ অফিসিয়াল লাইভ এক্সাম সেট করুন</h3>
+                    <h3 class="text-sm font-bold text-amber-900 mb-2">⏱️ অফিসিয়াল লাইভ এক্সাম সেট করুন (মাল্টিপল এক্সাম)</h3>
                     <div class="flex flex-col gap-2">
                         <div>
                             <label class="block text-gray-700 mb-1 font-semibold">পরীক্ষার নাম/শিরোনাম:</label>
@@ -307,7 +311,47 @@
                                 <option value="ALL">সব ক্যাটাগরি মিশিয়ে</option>
                             </select>
                         </div>
-                        <button onclick="saveLiveExamSettings()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl mt-2 transition shadow">🎯 লাইভ পরীক্ষা চালু করুন</button>
+                        <div>
+                            <label class="block text-gray-700 mb-1 font-semibold">পরীক্ষা ড্যাশবোর্ডে সচল থাকার শেষ সময়সীমা (End Time):</label>
+                            <input type="datetime-local" id="adm-live-expiry" class="w-full px-3 py-2 border rounded-xl bg-white text-sm">
+                        </div>
+                        <button onclick="saveLiveExamSettings()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl mt-2 transition shadow">🎯 নতুন লাইভ পরীক্ষা যুক্ত করুন</button>
+                    </div>
+                </div>
+
+                <!-- অ্যাক্টিভ অফিশিয়াল এক্সামগুলোর লিস্ট -->
+                <div class="bg-gray-50 p-4 rounded-xl border">
+                    <h3 class="text-sm font-bold text-gray-800 mb-2">📋 চলমান অফিশিয়াল এক্সাম তালিকা</h3>
+                    <div id="admin-active-exams-list" class="divide-y divide-gray-200">
+                        <p class="text-gray-400 text-xs">কোনো অ্যাক্টিভ পরীক্ষা নেই।</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN EXAM RESULTS VIEW TAB -->
+            <div id="admin-exam-results-tab" class="hidden flex flex-col gap-4 text-xs">
+                <div class="bg-white p-4 border rounded-xl">
+                    <h3 class="text-sm font-bold text-gray-800 mb-2">📈 অংশগ্রহণকারীদের মার্কস ও তালিকা</h3>
+                    <label class="block font-semibold text-gray-600 mb-1">পরীক্ষা নির্বাচন করুন:</label>
+                    <select id="adm-res-exam-select" onchange="loadExamAttemptsForAdmin()" class="w-full px-3 py-2 border rounded-xl bg-white text-xs mb-3">
+                        <option value="">নির্বাচন করুন...</option>
+                    </select>
+                    <div class="border rounded-xl max-h-[50vh] overflow-y-auto">
+                        <table class="w-full text-left text-xs divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-3 py-2 text-gray-500">নাম</th>
+                                    <th class="px-3 py-2 text-gray-500">মোবাইল</th>
+                                    <th class="px-3 py-2 text-gray-500">প্রাপ্ত নম্বর</th>
+                                    <th class="px-3 py-2 text-gray-500">সময়</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adm-exam-results-table-body" class="divide-y divide-gray-100">
+                                <tr>
+                                    <td colspan="4" class="text-center text-gray-400 py-4">পরীক্ষা সিলেক্ট করুন।</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -345,19 +389,9 @@
                         <p id="db-notice-text" class="text-gray-700 text-[11px] leading-relaxed whitespace-pre-line"></p>
                     </div>
 
-                    <!-- ড্যাশবোর্ড লাইভ এক্সাম বক্স -->
-                    <div id="db-live-exam-box" class="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 p-4 rounded-r-xl shadow-sm hidden">
-                        <div class="flex items-center justify-between mb-1.5">
-                            <div class="flex items-center gap-2">
-                                <span class="text-base">⏱️</span>
-                                <h4 class="font-bold text-red-800 text-xs" id="db-exam-title">চলমান লাইভ পরীক্ষা</h4>
-                            </div>
-                            <span class="bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full animate-pulse font-semibold">LIVE</span>
-                        </div>
-                        <p id="db-exam-desc" class="text-gray-600 text-[10px] mb-2"></p>
-                        <button onclick="goToLiveExamZone()" class="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold py-1.5 px-3 rounded-lg shadow transition">
-                            পরীক্ষায় অংশ নিন ➔
-                        </button>
+                    <!-- ড্যাশবোর্ড মাল্টিপল লাইভ এক্সাম বক্স -->
+                    <div id="db-multiple-live-exams" class="flex flex-col gap-3">
+                        <!-- এখানে সব লাইভ পরীক্ষা জেনারেট হবে -->
                     </div>
                 </div>
                 
@@ -415,21 +449,17 @@
 
             <!-- SUB SECTION B: প্রস্তুতি ও বুকমার্ক -->
             <div id="drawer-sec-preparation" class="hidden flex flex-col gap-4 overflow-y-auto max-h-[82vh]">
-                
-                <!-- ক্যাটাগরি ভিত্তিক প্রশ্ন ব্যাংক সেকশন -->
+                <!-- প্রস্তুতি সেকশন কন্টেন্ট অপরিবর্তিত রাখা হয়েছে -->
                 <div class="bg-white p-4 border rounded-2xl shadow-sm flex flex-col gap-3">
                     <h3 class="text-xs font-bold text-gray-700 flex items-center gap-1">📚 বিষয়ভিত্তিক প্রশ্ন ব্যাংক (Self-Study)</h3>
                     <div>
                         <label class="block text-gray-500 text-[11px] mb-1 font-medium">ক্যাটাগরি নির্বাচন করুন:</label>
                         <select id="prep-cat-select" onchange="loadCategoryQuestionsForPrep()" class="w-full px-3 py-2 border border-gray-200 rounded-xl bg-white text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <!-- ডায়নামিক ক্যাটাগরি লোড হবে -->
                         </select>
                         <button onclick="openFullScreenReader()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow mt-3">
                             📖 ফুল স্ক্রিন রিডার মোডে পড়ুন
                         </button>
                     </div>
-                    
-                    <!-- প্রশ্ন প্রদর্শনের কন্টেইনার -->
                     <div id="prep-questions-container" class="max-h-[35vh] overflow-y-auto border border-gray-100 rounded-xl divide-y divide-gray-100 p-2 bg-gray-50/50">
                         <p class="text-center text-xs text-gray-400 py-4">একটি ক্যাটাগরি সিলেক্ট করুন</p>
                     </div>
@@ -458,32 +488,18 @@
                         দেখুন 📂
                     </button>
                 </div>
-
-                <div class="bg-gray-50 p-4 border rounded-2xl">
-                    <h4 class="text-xs font-bold text-gray-700 mb-2">💡 সেলফ স্টাডি গাইড</h4>
-                    <ul class="text-xs text-gray-600 list-disc list-inside space-y-1 leading-relaxed">
-                        <li>আপনার উইক জোন বা দুর্বল অধ্যায়ের প্রশ্নগুলো বারবার অনুশীলন করুন।</li>
-                        <li>যেকোনো সাধারণ কুইজ দেওয়ার সময় কঠিন প্রশ্নগুলো বুকমার্ক করে রাখুন।</li>
-                        <li>নেভিগেশন ড্রয়ার থেকে সরাসরি যেকোনো সাব-সেকশনে ভিজিট করতে পারবেন।</li>
-                    </ul>
-                </div>
             </div>
 
             <!-- SUB SECTION C: লাইভ এক্সাম জোন -->
             <div id="drawer-sec-live-exam" class="hidden flex flex-col gap-4 overflow-y-auto max-h-[82vh]">
-                
                 <div id="user-notice-box" class="hidden bg-amber-50 border border-amber-200 p-4 rounded-2xl text-left mb-3">
                     <span class="text-xs font-bold text-amber-800 flex items-center gap-1">📢 সর্বশেষ আপডেট/নোটিশ:</span>
                     <p id="user-notice-text" class="text-xs text-gray-700 mt-1 leading-relaxed"></p>
                 </div>
 
-                <div id="official-live-exam-box" class="hidden bg-emerald-50 border border-emerald-100 p-4 rounded-2xl text-center mb-4">
-                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1 rounded-full">এডমিন নির্ধারিত পরীক্ষা</span>
-                    <h3 id="official-exam-title" class="text-base font-bold text-emerald-950 mt-2">로드 হচ্ছে...</h3>
-                    <p id="official-exam-desc" class="text-xs text-emerald-700 mt-1">সময়: - মিনিট | প্রশ্ন: - টি</p>
-                    <button onclick="startOfficialLiveQuiz()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs mt-3 shadow-md transition">
-                        📝 পরীক্ষা দিন
-                    </button>
+                <!-- অফিসিয়াল মাল্টিপল লাইভ এক্সাম জোন কন্টেইনার -->
+                <div id="official-live-exams-container" class="flex flex-col gap-3 mb-4">
+                    <!-- ডায়নামিক অফিশিয়াল লাইভ এক্সামসমূহ লোড হবে -->
                 </div>
 
                 <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl text-center">
@@ -497,6 +513,17 @@
                 <button onclick="openSetupModal(true)" id="incorrect-rev-btn" class="hidden w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md">
                     ⚠️ ভুল করা প্রশ্নের ওপর পরীক্ষা দিন
                 </button>
+            </div>
+
+            <!-- SUB SECTION D: ফলাফল ও বিশ্লেষণ সেকশন (নতুন রেজাল্ট সেকশন) -->
+            <div id="drawer-sec-user-results" class="hidden flex flex-col gap-4 overflow-y-auto max-h-[82vh]">
+                <div class="bg-white p-4 border rounded-2xl shadow-sm">
+                    <h3 class="text-sm font-bold text-gray-800 mb-1">📊 সম্পন্ন অফিশিয়াল পরীক্ষাসমূহ</h3>
+                    <p class="text-xs text-gray-500 mb-3 leading-relaxed">নির্ধারিত পরীক্ষার সময় শেষ হওয়ার পরেই কেবল ব্যাখ্যামূলক উত্তরপত্র দৃশ্যমান হবে।</p>
+                    <div id="user-results-history-list" class="divide-y divide-gray-150">
+                        <p class="text-center text-xs text-gray-400 py-6">কোনো পরীক্ষার ডাটা নেই।</p>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -553,23 +580,33 @@
             </div>
 
             <div class="my-6">
-                <h3 id="question-text" class="text-lg font-bold text-gray-800 leading-snug">로드 হচ্ছে...</h3>
+                <h3 id="question-text" class="text-lg font-bold text-gray-800 leading-snug">লোড হচ্ছে...</h3>
             </div>
 
             <div class="flex flex-col gap-3" id="options-container"></div>
 
+            <!-- অফিশিয়াল পরীক্ষার ক্ষেত্রে এই ব্যাখ্যা বক্সটি লাইভ পরীক্ষায় বন্ধ থাকবে -->
             <div id="explanation-box" class="hidden mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
                 <span class="text-xs font-bold text-amber-800 block mb-1">💡 ব্যাখ্যা:</span>
                 <p id="explanation-text" class="text-sm text-gray-700"></p>
             </div>
 
             <div class="mt-6 flex flex-col gap-2">
-                <div class="flex gap-2 w-full">
-                    <button onclick="forceEndExam()" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3 px-4 rounded-xl text-xs transition border border-red-200 shrink-0">
-                        🛑 পরীক্ষা শেষ করুন
+                <!-- পরীক্ষা চলাকালীন নেভিগেশনাল ড্যাশবোর্ড -->
+                <div class="flex justify-between items-center gap-2 w-full my-2">
+                    <button id="prev-btn" onclick="previousQuestion()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2.5 rounded-xl text-xs transition">
+                        ◀ Previous
                     </button>
-                    <button id="next-btn" onclick="nextQuestion()" class="hidden flex-grow bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-xs transition">
-                        পরবর্তী প্রশ্ন
+                    <button id="skip-btn" onclick="skipQuestion()" class="flex-1 bg-amber-100 hover:bg-amber-200 text-amber-800 font-semibold py-2.5 rounded-xl text-xs transition">
+                        Skip ↷
+                    </button>
+                    <button id="next-btn" onclick="nextQuestion()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl text-xs transition">
+                        Next ▶
+                    </button>
+                </div>
+                <div class="flex gap-2 w-full">
+                    <button onclick="forceEndExam()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl text-xs transition shadow-md">
+                        🛑 পরীক্ষা সমাপ্ত করে মার্কস জমা দিন
                     </button>
                 </div>
                 <button onclick="exitQuizToPortal()" class="w-full text-center text-gray-400 hover:text-gray-600 text-xs py-1 transition underline">ড্যাশবোর্ডে ফিরে যান (প্রগ্রেস বাতিল হবে)</button>
@@ -613,6 +650,19 @@
                     <button onclick="closeBookmarkModal()" class="text-gray-400 text-lg hover:text-gray-600">✕</button>
                 </div>
                 <div id="bookmark-list-container" class="overflow-y-auto flex-grow divide-y divide-gray-100 text-xs text-gray-700"></div>
+            </div>
+        </div>
+
+        <!-- ================= USER ATTEMPT DETAILS MODAL (নতুন ফলাফল মডাল) ================= -->
+        <div id="attempt-details-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-[480px] rounded-2xl p-5 flex flex-col gap-4 max-h-[85vh]">
+                <div class="flex justify-between items-center border-b pb-2">
+                    <h3 id="attempt-modal-title" class="font-bold text-gray-800 text-sm">পরীক্ষার উত্তরপত্র বিশ্লেষণ</h3>
+                    <button onclick="closeAttemptDetailsModal()" class="text-gray-400 text-lg hover:text-gray-600">✕</button>
+                </div>
+                <div id="attempt-questions-analysis-list" class="overflow-y-auto flex-grow divide-y divide-gray-100 space-y-4">
+                    <!-- বিস্তারিত সঠিক, ভুল, স্কিপকৃত প্রশ্নাবলি ডাইনামিকালি এখানে লোড হবে -->
+                </div>
             </div>
         </div>
 
@@ -680,11 +730,8 @@
         
         let currentUser = ""; 
         let currentUserPhone = ""; 
-        let officialExamConfig = null;
         let tempBookmarkQId = null;
 
-        let answered = false;
-        
         let dashboardChartInstance = null;
         let resultChartInstance = null;
         let categories = new Set(["সাধারণ জ্ঞান", "ইংরেজি", "বাংলা"]);
@@ -697,6 +744,13 @@
 
         let countdownTimer = null;
         let totalSecondsRemaining = 0;
+
+        // নতুন এক্সাম স্টেট ভেরিয়েবলসমূহ
+        let currentExamId = null; // null মানে কাস্টম এক্সাম, স্ট্র্রিং আইডি মানে অফিশিয়াল এক্সাম
+        let currentExamTitle = "";
+        let userSelectedAnswers = {}; // { questionId: selectedOptionKey }
+        let officialExamsList = []; // ডাটাবেসের চলমান অফিশিয়াল এক্সামসমূহ
+        let completedExamIds = []; // কারেন্ট ইউজারের সম্পন্ন করা অফিশিয়াল এক্সামসমূহের তালিকা
 
         const ADMIN_PASSWORD = "admin123"; 
 
@@ -711,9 +765,9 @@
                     document.getElementById("login-screen").classList.add("hidden");
                     document.getElementById("admin-dashboard").classList.remove("hidden");
                     await fetchLiveQuestions();
+                    await fetchOfficialExams();
                     renderAdminQuestionList();
                 } else {
-                    // Fetch user details and login
                     try {
                         const userRef = doc(db, "users", savedPhone);
                         const userSnap = await getDoc(userRef);
@@ -741,6 +795,7 @@
                             
                             switchDrawerSection('profile'); 
                             await fetchLiveQuestions();
+                            await fetchOfficialExams();
                             await loadUserDashboardData();
                         }
                     } catch (e) {
@@ -766,7 +821,7 @@
         }
 
         window.switchDrawerSection = function(section) {
-            const sections = ['profile', 'preparation', 'live-exam'];
+            const sections = ['profile', 'preparation', 'live-exam', 'user-results'];
             sections.forEach(sec => {
                 const secEl = document.getElementById(`drawer-sec-${sec}`);
                 const btnEl = document.getElementById(`nav-btn-${sec}`);
@@ -778,6 +833,9 @@
                     if(btnEl) btnEl.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition";
                 }
             });
+            if (section === 'user-results') {
+                loadUserResultsHistory();
+            }
             toggleDrawer(false); 
         }
 
@@ -890,6 +948,8 @@
                 document.getElementById("user-portal").classList.remove("hidden");
                 
                 switchDrawerSection('profile'); 
+                await fetchLiveQuestions();
+                await fetchOfficialExams();
                 await loadUserDashboardData();
 
             } catch (e) {
@@ -937,6 +997,113 @@
             } catch (error) {
                 console.error("ফায়ারবেস থেকে প্রশ্ন আনা যায়নি:", error);
             }
+        }
+
+        // অফিশিয়াল পরীক্ষার লিস্ট ডাটাবেস থেকে রিকোয়েস্ট করা (মাল্টিপল এক্সাম সাপোর্ট)
+        async function fetchOfficialExams() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "official_exams"));
+                officialExamsList = [];
+                querySnapshot.forEach(docSnap => {
+                    const examData = docSnap.data();
+                    const expiryDate = examData.expiryTime ? new Date(examData.expiryTime) : null;
+                    
+                    // মেয়াদ শেষ হয়ে গেলে ড্যাশবোর্ডে সচল দেখাবে না
+                    if (!expiryDate || expiryDate > new Date()) {
+                        officialExamsList.push({
+                            id: docSnap.id,
+                            ...examData,
+                            expiryTimeObject: expiryDate
+                        });
+                    }
+                });
+                
+                // ইউজার পোর্টালের জন্য এক্সাম হিস্ট্রি এবং বাটন রেন্ডারিং সচল করা
+                if (currentUserPhone) {
+                    await fetchUserCompletedExamIds();
+                }
+                renderUserLiveExamsUI();
+            } catch(e) {
+                console.error("অফিশিয়াল এক্সাম রিস্ট্রাকচার প্রসেস ফেইল্ড:", e);
+            }
+        }
+
+        async function fetchUserCompletedExamIds() {
+            try {
+                const qSnap = await getDocs(query(collection(db, "exam_attempts"), where("userPhone", "==", currentUserPhone)));
+                completedExamIds = [];
+                qSnap.forEach(docSnap => {
+                    completedExamIds.push(docSnap.data().examId);
+                });
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        function renderUserLiveExamsUI() {
+            const dbExamBox = document.getElementById("db-multiple-live-exams");
+            const liveContainer = document.getElementById("official-live-exams-container");
+            
+            if (dbExamBox) dbExamBox.innerHTML = "";
+            if (liveContainer) liveContainer.innerHTML = "";
+
+            if (officialExamsList.length === 0) {
+                if (liveContainer) liveContainer.innerHTML = '<p class="text-center text-xs text-gray-400 py-3">বর্তমানে কোনো সক্রিয় অফিশিয়াল লাইভ পরীক্ষা নেই।</p>';
+                return;
+            }
+
+            officialExamsList.forEach(exam => {
+                const isCompleted = completedExamIds.includes(exam.id);
+                
+                const descText = `সময়: ${exam.timeLimit || 0} মিনিট | প্রশ্ন: ${exam.qLimit || 0} টি | বিষয়: ${exam.category === 'ALL' ? 'সব বিষয়' : exam.category}`;
+                
+                // ১. প্রোফাইল/ড্যাশবোর্ড ডেবো বক্স রেন্ডারিং
+                if (dbExamBox) {
+                    const examBox = document.createElement("div");
+                    examBox.className = "bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 p-4 rounded-r-xl shadow-sm";
+                    examBox.innerHTML = `
+                        <div class="flex items-center justify-between mb-1.5">
+                            <div class="flex items-center gap-2">
+                                <span class="text-base">⏱️</span>
+                                <h4 class="font-bold text-red-800 text-xs">${exam.title}</h4>
+                            </div>
+                            <span class="bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-full animate-pulse font-semibold">LIVE</span>
+                        </div>
+                        <p class="text-gray-600 text-[10px] mb-2">${descText}</p>
+                        ${isCompleted ? `
+                            <button disabled class="bg-gray-400 text-white text-[10px] font-bold py-1.5 px-3 rounded-lg shadow cursor-not-allowed">
+                                পরীক্ষাটি ইতিপূর্বে দিয়েছেন ✓
+                            </button>
+                        ` : `
+                            <button onclick="goToLiveExamZone()" class="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold py-1.5 px-3 rounded-lg shadow transition">
+                                পরীক্ষায় অংশ নিন ➔
+                            </button>
+                        `}
+                    `;
+                    dbExamBox.appendChild(examBox);
+                }
+
+                // ২. লাইভ এক্সাম জোন রেন্ডারিং
+                if (liveContainer) {
+                    const lBox = document.createElement("div");
+                    lBox.className = "bg-emerald-50 border border-emerald-100 p-4 rounded-2xl text-center shadow-sm";
+                    lBox.innerHTML = `
+                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1 rounded-full">অফিশিয়াল লাইভ পরীক্ষা</span>
+                        <h3 class="text-base font-bold text-emerald-950 mt-2">${exam.title}</h3>
+                        <p class="text-xs text-emerald-700 mt-1">${descText}</p>
+                        ${isCompleted ? `
+                            <button disabled class="w-full bg-gray-400 text-white font-bold py-2.5 rounded-xl text-xs mt-3 cursor-not-allowed shadow">
+                                আপনি ইতিপূর্বে অংশগ্রহণ করেছেন ✓
+                            </button>
+                        ` : `
+                            <button onclick="startOfficialLiveQuiz('${exam.id}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs mt-3 shadow-md transition">
+                                📝 পরীক্ষা দিন
+                            </button>
+                        `}
+                    `;
+                    liveContainer.appendChild(lBox);
+                }
+            });
         }
 
         function updateCategoryDropdowns() {
@@ -1077,13 +1244,15 @@
             const addTab = document.getElementById("admin-add-tab");
             const manageTab = document.getElementById("admin-manage-tab");
             const settingsTab = document.getElementById("admin-exam-settings-tab");
+            const resultsTab = document.getElementById("admin-exam-results-tab");
             
             const addBtn = document.getElementById("tab-add-btn");
             const manageBtn = document.getElementById("tab-manage-btn");
             const settingsBtn = document.getElementById("tab-exam-settings-btn");
+            const resultsBtn = document.getElementById("tab-exam-results-btn");
 
-            [addTab, manageTab, settingsTab].forEach(el => { if(el) el.classList.add("hidden"); });
-            [addBtn, manageBtn, settingsBtn].forEach(btn => { if(btn) btn.className = "flex-1 pb-2 border-b-2 border-transparent text-gray-500"; });
+            [addTab, manageTab, settingsTab, resultsTab].forEach(el => { if(el) el.classList.add("hidden"); });
+            [addBtn, manageBtn, settingsBtn, resultsBtn].forEach(btn => { if(btn) btn.className = "flex-1 pb-2 border-b-2 border-transparent text-gray-500"; });
 
             if (tabName === 'add') {
                 if(addTab) addTab.classList.remove("hidden");
@@ -1096,6 +1265,11 @@
                 if(settingsTab) settingsTab.classList.remove("hidden");
                 if(settingsBtn) settingsBtn.className = "flex-1 pb-2 border-b-2 border-indigo-600 font-semibold text-indigo-600";
                 loadAdminSettingsFields();
+                renderAdminActiveExamsList();
+            } else if (tabName === 'exam-results') {
+                if(resultsTab) resultsTab.classList.remove("hidden");
+                if(resultsBtn) resultsBtn.className = "flex-1 pb-2 border-b-2 border-indigo-600 font-semibold text-indigo-600";
+                loadAdminExamsDropdown();
             }
         }
 
@@ -1311,7 +1485,7 @@
                     document.getElementById("life-total-wrong").innerText = uData.lifetimeWrong || 0;
                 }
 
-                // নোটিশ ও লাইভ এক্সাম ডাটাবেস কনফিগ থেকে রিড করা
+                // নোটিশ আপডেট সিস্টেম সেটিংস থেকে লোড করা
                 try {
                     const settingsSnap = await getDoc(doc(db, "system_settings", "live_config"));
                     if (settingsSnap.exists()) {
@@ -1331,32 +1505,6 @@
                                 document.getElementById("user-notice-box").classList.add("hidden");
                             }
                         }
-                        
-                        const examTitle = sysData.examTitle ? sysData.examTitle.trim() : "";
-                        if (examTitle !== "") {
-                            officialExamConfig = sysData;
-                            const descText = `সময়: ${sysData.examTimeLimit || 0} মিনিট | প্রশ্ন: ${sysData.examQLimit || 0} টি | বিষয়: ${sysData.examCategory === 'ALL' ? 'সব বিষয়' : sysData.examCategory}`;
-                            
-                            document.getElementById("db-live-exam-box").classList.remove("hidden");
-                            document.getElementById("db-exam-title").innerText = examTitle;
-                            document.getElementById("db-exam-desc").innerText = descText;
-                            
-                            if(document.getElementById("official-live-exam-box")) {
-                                document.getElementById("official-live-exam-box").classList.remove("hidden");
-                                document.getElementById("official-exam-title").innerText = examTitle;
-                                document.getElementById("official-exam-desc").innerText = descText;
-                            }
-                        } else {
-                            document.getElementById("db-live-exam-box").classList.add("hidden");
-                            if(document.getElementById("official-live-exam-box")) {
-                                document.getElementById("official-live-exam-box").classList.add("hidden");
-                            }
-                        }
-                    } else {
-                        document.getElementById("db-notice-box").classList.add("hidden");
-                        document.getElementById("db-live-exam-box").classList.add("hidden");
-                        if(document.getElementById("user-notice-box")) document.getElementById("user-notice-box").classList.add("hidden");
-                        if(document.getElementById("official-live-exam-box")) document.getElementById("official-live-exam-box").classList.add("hidden");
                     }
                 } catch (err) {
                     console.error("কনফিগ লোড সমস্যা:", err);
@@ -1541,6 +1689,11 @@
                 return;
             }
 
+            // সাধারণ কাস্টম এক্সামের সেটিংস
+            currentExamId = null;
+            currentExamTitle = "কাস্টম কুইজ পরীক্ষা";
+            userSelectedAnswers = {};
+
             closeSetupModal();
             document.getElementById("user-portal").classList.add("hidden");
             document.getElementById("quiz-screen").classList.remove("hidden");
@@ -1591,7 +1744,7 @@
         }
 
         window.forceEndExam = function() {
-            if (confirm("আপনি কি নিশ্চিতভাবে এখনই পরীক্ষাটি সমাপ্ত করতে চান? এই সময় পর্যন্ত দেওয়া সঠিক ও ভুল উত্তরের উপর ভিত্তি করে স্কোরবোর্ড তৈরি হবে।")) {
+            if (confirm("আপনি কি নিশ্চিতভাবে এখনই পরীক্ষাটি সমাপ্ত করতে চান? এই সময় পর্যন্ত দেওয়া উত্তরের উপর ভিত্তি করে আপনার ফাইনাল মার্কস সাবমিট করা হবে।")) {
                 if (countdownTimer) clearInterval(countdownTimer);
                 calculateAndSaveResult();
             }
@@ -1607,9 +1760,11 @@
         }
 
         function loadQuestion() {
-            answered = false;
-            document.getElementById("next-btn").classList.add("hidden");
-            document.getElementById("explanation-box").classList.add("hidden");
+            // পরবর্তী/পূর্ববর্তী নেভিগেশনের জন্য বাটন ভিজিবিলিটি
+            document.getElementById("prev-btn").style.display = currentQuestionIndex === 0 ? "none" : "block";
+            
+            const isLast = currentQuestionIndex === activeQuizQuestions.length - 1;
+            document.getElementById("skip-btn").innerText = isLast ? "Skip & View Result" : "Skip ↷";
 
             const q = activeQuizQuestions[currentQuestionIndex];
             document.getElementById("category-display").innerText = q.category;
@@ -1636,13 +1791,71 @@
                 { key: 'Option D', text: q.optionD }
             ];
 
+            // কারেন্ট প্রশ্নটির আগে সিলেক্ট করা উত্তর রিকভার করা (নেভিগেশনের জন্য)
+            const previouslySelected = userSelectedAnswers[q.id] || null;
+
             opts.forEach(opt => {
                 const btn = document.createElement("button");
-                btn.className = "w-full text-left px-4 py-3 border-2 border-gray-100 rounded-xl font-medium text-gray-700 hover:bg-gray-50 transition duration-150 text-sm";
+                btn.className = "w-full text-left px-4 py-3 border-2 rounded-xl font-medium transition duration-150 text-sm";
+                
+                // অফিশিয়াল ও কাস্টম দুই পরীক্ষার জন্যই লাইভ মার্কিং ও ব্যাখ্যা বন্ধ থাকবে, শুধুমাত্র সিলেক্টেড বর্ডার কালার দেখাবে
+                if (previouslySelected === opt.key) {
+                    btn.className += " border-indigo-600 bg-indigo-50 text-indigo-900 font-bold";
+                } else {
+                    btn.className += " border-gray-100 text-gray-700 hover:bg-gray-50";
+                }
+                
                 btn.innerText = opt.text;
-                btn.onclick = () => checkAnswer(btn, opt.key, q.correct, q.explanation);
+                btn.onclick = () => selectAnswer(btn, opt.key);
                 optionsContainer.appendChild(btn);
             });
+        }
+
+        // লাইভ মার্ক বা ব্যাখ্যা না দেখিয়ে ইউজার অপশন সেভ করার ফিচার
+        function selectAnswer(selectedBtn, selectedKey) {
+            const q = activeQuizQuestions[currentQuestionIndex];
+            userSelectedAnswers[q.id] = selectedKey;
+            
+            // রেন্ডার অপশন আপডেট (একটাই সিলেক্টেড রেন্ডার হবে)
+            const buttons = document.getElementById("options-container").getElementsByTagName("button");
+            const keys = ['Option A', 'Option B', 'Option C', 'Option D'];
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].className = "w-full text-left px-4 py-3 border-2 border-gray-100 rounded-xl font-medium text-gray-700 hover:bg-gray-50 transition duration-150 text-sm";
+                if (keys[i] === selectedKey) {
+                    buttons[i].className = "w-full text-left px-4 py-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-900 font-bold rounded-xl text-sm";
+                }
+            }
+        }
+
+        window.previousQuestion = function() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        window.skipQuestion = function() {
+            const q = activeQuizQuestions[currentQuestionIndex];
+            if (!userSelectedAnswers[q.id]) {
+                userSelectedAnswers[q.id] = "skipped";
+            }
+            if (currentQuestionIndex < activeQuizQuestions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                if (countdownTimer) clearInterval(countdownTimer);
+                calculateAndSaveResult();
+            }
+        }
+
+        window.nextQuestion = function() {
+            if (currentQuestionIndex < activeQuizQuestions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                if (countdownTimer) clearInterval(countdownTimer); 
+                calculateAndSaveResult();
+            }
         }
 
         window.toggleBookmarkCurrent = async function() {
@@ -1738,67 +1951,27 @@
             }
         }
 
-        async function checkAnswer(selectedBtn, selectedKey, correctKey, explanation) {
-            if (answered) return;
-            answered = true;
-
-            const currentQ = activeQuizQuestions[currentQuestionIndex];
-            const buttons = document.getElementById("options-container").getElementsByTagName("button");
-            const keys = ['Option A', 'Option B', 'Option C', 'Option D'];
-            const correctIndex = keys.indexOf(correctKey);
-            const selectedIndex = keys.indexOf(selectedKey);
-
-            if (correctIndex !== -1) {
-                buttons[correctIndex].classList.add("bg-green-100", "border-green-500", "text-green-800", "font-bold");
-            }
-
-            if (selectedKey === correctKey) {
-                correctAnswers++;
-                if (isIncorrectRevisionMode) {
-                    const match = userIncorrectQuestions.find(item => item.questionId === currentQ.id);
-                    if (match) {
-                        await deleteDoc(doc(db, "incorrect_questions", match.docId));
-                    }
-                }
-            } else {
-                wrongAnswers++;
-                if (selectedIndex !== -1) {
-                    buttons[selectedIndex].classList.add("bg-red-100", "border-red-500", "text-red-800");
-                }
-
-                const alreadyExists = userIncorrectQuestions.some(item => item.questionId === currentQ.id);
-                if (!alreadyExists) {
-                    await addDoc(collection(db, "incorrect_questions"), {
-                        username: currentUserPhone,
-                        questionId: currentQ.id,
-                        category: currentQ.category || "সাধারণ জ্ঞান",
-                        text: currentQ.text,
-                        date: new Date()
-                    });
-                }
-            }
-
-            if (explanation) {
-                document.getElementById("explanation-text").innerText = explanation;
-                document.getElementById("explanation-box").classList.remove("hidden");
-            }
-
-            document.getElementById("next-btn").classList.remove("hidden");
-        }
-
-        window.nextQuestion = function() {
-            if (currentQuestionIndex < activeQuizQuestions.length - 1) {
-                currentQuestionIndex++;
-                loadQuestion();
-            } else {
-                if (countdownTimer) clearInterval(countdownTimer); 
-                calculateAndSaveResult();
-            }
-        }
-
         async function calculateAndSaveResult() {
             document.getElementById("quiz-screen").classList.add("hidden");
             document.getElementById("result-screen").classList.remove("hidden");
+
+            // নতুন করে সাবমিট করা উত্তরগুলোর চূড়ান্ত এনালাইসিস রানিং লুপ
+            correctAnswers = 0;
+            wrongAnswers = 0;
+            let skippedAnswers = 0;
+
+            activeQuizQuestions.forEach(q => {
+                const userAns = userSelectedAnswers[q.id];
+                if (!userAns || userAns === "skipped") {
+                    skippedAnswers++;
+                } else if (userAns === q.correct) {
+                    correctAnswers++;
+                } else {
+                    wrongAnswers++;
+                    // ভুল প্রশ্নের উইক জোন ট্র্যাকিং
+                    addIncorrectToDatabase(q);
+                }
+            });
 
             const negativeMarks = wrongAnswers * 0.5;
             const finalScore = (correctAnswers * 1) - negativeMarks;
@@ -1811,12 +1984,33 @@
             renderResultChart(correctAnswers, wrongAnswers);
 
             try {
+                // ১. গ্লোবাল লিডারবোর্ডের জন্য মার্কস সেভ
                 await addDoc(collection(db, "leaderboard"), {
                     name: currentUser,
                     phone: currentUserPhone,
                     score: finalScore,
                     date: new Date()
                 });
+
+                // ২. যদি অফিশিয়াল পরীক্ষা হয়ে থাকে তবে বিস্তারিত হিস্ট্রি সেভ করা
+                if (currentExamId) {
+                    await addDoc(collection(db, "exam_attempts"), {
+                        userPhone: currentUserPhone,
+                        userName: currentUser,
+                        examId: currentExamId,
+                        examTitle: currentExamTitle,
+                        score: finalScore,
+                        correct: correctAnswers,
+                        wrong: wrongAnswers,
+                        skipped: skippedAnswers,
+                        userAnswers: userSelectedAnswers, // সব অপশন ডাঁটা সহ সেভ
+                        quizQuestions: activeQuizQuestions, // সম্পূর্ণ প্রশ্ন লিস্ট ব্যাকআপ সেভ
+                        submittedAt: new Date().toISOString()
+                    });
+                    
+                    // মেমোরি লিস্ট আপডেট করা
+                    completedExamIds.push(currentExamId);
+                }
 
                 const userRef = doc(db, "users", currentUserPhone);
                 const userSnap = await getDoc(userRef);
@@ -1837,9 +2031,23 @@
             }
         }
 
+        async function addIncorrectToDatabase(q) {
+            const alreadyExists = userIncorrectQuestions.some(item => item.questionId === q.id);
+            if (!alreadyExists) {
+                await addDoc(collection(db, "incorrect_questions"), {
+                    username: currentUserPhone,
+                    questionId: q.id,
+                    category: q.category || "সাধারণ জ্ঞান",
+                    text: q.text,
+                    date: new Date()
+                });
+            }
+        }
+
         window.backToUserPortal = async function() {
             document.getElementById("result-screen").classList.add("hidden");
             document.getElementById("user-portal").classList.remove("hidden");
+            await fetchOfficialExams();
             await loadUserDashboardData();
         }
 
@@ -2077,10 +2285,6 @@
                 if (settingsSnap.exists()) {
                     const data = settingsSnap.data();
                     document.getElementById("adm-notice-text").value = data.notice || "";
-                    document.getElementById("adm-live-title").value = data.examTitle || "";
-                    document.getElementById("adm-live-q-limit").value = data.examQLimit || "";
-                    document.getElementById("adm-live-time-limit").value = data.examTimeLimit || "";
-                    document.getElementById("adm-live-category").value = data.examCategory || "ALL";
                 }
                 const liveCatSelect = document.getElementById("adm-live-category");
                 liveCatSelect.innerHTML = '<option value="ALL">সব ক্যাটাগরি মিশিয়ে</option>';
@@ -2106,47 +2310,289 @@
             }
         }
 
+        // নতুন এক্সাম সেভিংস মেথড (মাল্টিপল এক্সাম কালেকশন সাপোর্ট)
         window.saveLiveExamSettings = async function() {
             const title = document.getElementById("adm-live-title").value.trim();
             const qLimit = parseInt(document.getElementById("adm-live-q-limit").value);
             const timeLimit = parseInt(document.getElementById("adm-live-time-limit").value);
             const category = document.getElementById("adm-live-category").value;
+            const expiryTime = document.getElementById("adm-live-expiry").value;
 
-            if(!title || !qLimit || !timeLimit) {
+            if(!title || !qLimit || !timeLimit || !expiryTime) {
                 alert("পরীক্ষার সেটিংসের সব তথ্য সঠিকভাবে পূরণ করুন!");
                 return;
             }
             try {
-                await setDoc(doc(db, "system_settings", "live_config"), {
-                    examTitle: title,
-                    examQLimit: qLimit,
-                    examTimeLimit: timeLimit,
-                    examCategory: category
-                }, { merge: true });
-                alert("🎯 অফিসিয়াল কাস্টম পরীক্ষা সফলভাবে লাইভ করা হয়েছে!");
+                await addDoc(collection(db, "official_exams"), {
+                    title: title,
+                    qLimit: qLimit,
+                    timeLimit: timeLimit,
+                    category: category,
+                    expiryTime: expiryTime, // ISO string formatted string value
+                    createdAt: new Date().toISOString()
+                });
+                alert("🎯 অফিসিয়াল পরীক্ষা সফলভাবে লাইভ ডেটাবেসে যুক্ত করা হয়েছে!");
+                document.getElementById("adm-live-title").value = "";
+                document.getElementById("adm-live-q-limit").value = "";
+                document.getElementById("adm-live-time-limit").value = "";
+                document.getElementById("adm-live-expiry").value = "";
+                await renderAdminActiveExamsList();
             } catch(e) {
                 alert("ত্রুটি: " + e.message);
             }
         }
 
-        window.startOfficialLiveQuiz = function() {
-            if(!officialExamConfig) return;
-            let examQs = [...questions];
-            if (officialExamConfig.examCategory !== "ALL") {
-                examQs = examQs.filter(q => q.category === officialExamConfig.examCategory);
+        async function renderAdminActiveExamsList() {
+            const container = document.getElementById("admin-active-exams-list");
+            if (!container) return;
+            container.innerHTML = "<p class='text-xs text-gray-400 py-2'>লোড হচ্ছে...</p>";
+            try {
+                const qSnap = await getDocs(collection(db, "official_exams"));
+                if (qSnap.size === 0) {
+                    container.innerHTML = "<p class='text-xs text-gray-400 py-2'>কোনো পরীক্ষা নেই।</p>";
+                    return;
+                }
+                container.innerHTML = "";
+                qSnap.forEach(docSnap => {
+                    const ex = docSnap.data();
+                    const div = document.createElement("div");
+                    div.className = "py-2.5 flex justify-between items-center text-xs";
+                    div.innerHTML = `
+                        <div>
+                            <p class="font-bold text-gray-800">${ex.title}</p>
+                            <p class="text-gray-500 text-[10px]">প্রশ্ন: ${ex.qLimit} টি | সময়: ${ex.timeLimit} মি. | শেষ সময়: ${ex.expiryTime}</p>
+                        </div>
+                        <button onclick="deleteOfficialExam('${docSnap.id}')" class="bg-rose-100 hover:bg-rose-200 text-rose-600 px-2.5 py-1 rounded-lg font-bold">মুছুন 🗑️</button>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch(e) {
+                console.error(e);
             }
-            if(examQs.length < officialExamConfig.examQLimit) {
+        }
+
+        window.deleteOfficialExam = async function(examId) {
+            if (confirm("আপনি কি নিশ্চিতভাবে এই পরীক্ষাটি মুছে ফেলতে চান?")) {
+                try {
+                    await deleteDoc(doc(db, "official_exams", examId));
+                    alert("🗑️ পরীক্ষা মুছে ফেলা হয়েছে!");
+                    await renderAdminActiveExamsList();
+                } catch(e) {
+                    alert(e.message);
+                }
+            }
+        }
+
+        // এডমিন মার্কস ভিউ ফিল্টার সিস্টেম লোড
+        async function loadAdminExamsDropdown() {
+            const select = document.getElementById("adm-res-exam-select");
+            select.innerHTML = '<option value="">নির্বাচন করুন...</option>';
+            try {
+                const qSnap = await getDocs(collection(db, "official_exams"));
+                qSnap.forEach(doc => {
+                    const opt = document.createElement("option");
+                    opt.value = doc.id;
+                    opt.textContent = doc.data().title;
+                    select.appendChild(opt);
+                });
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        window.loadExamAttemptsForAdmin = async function() {
+            const examId = document.getElementById("adm-res-exam-select").value;
+            const tableBody = document.getElementById("adm-exam-results-table-body");
+            if (!examId) {
+                tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-400 py-4">পরীক্ষা সিলেক্ট করুন।</td></tr>';
+                return;
+            }
+            tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-400 py-4">লোড হচ্ছে...</td></tr>';
+            try {
+                const q = query(collection(db, "exam_attempts"), where("examId", "==", examId));
+                const qSnap = await getDocs(q);
+                tableBody.innerHTML = "";
+                if (qSnap.size === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-400 py-4">কেউ এখনো এই পরীক্ষায় অংশ নেয়নি।</td></tr>';
+                    return;
+                }
+                qSnap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const tr = document.createElement("tr");
+                    tr.className = "hover:bg-gray-50 border-b";
+                    tr.innerHTML = `
+                        <td class="px-3 py-2 text-gray-800">${data.userName || "ইউজার"}</td>
+                        <td class="px-3 py-2 text-gray-600">${data.userPhone || "-"}</td>
+                        <td class="px-3 py-2 text-indigo-600 font-bold">${data.score}</td>
+                        <td class="px-3 py-2 text-gray-400 text-[10px]">${data.submittedAt ? data.submittedAt.split("T")[0] : "-"}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        window.startOfficialLiveQuiz = function(examId) {
+            const targetExam = officialExamsList.find(e => e.id === examId);
+            if(!targetExam) return;
+
+            let examQs = [...questions];
+            if (targetExam.category !== "ALL") {
+                examQs = examQs.filter(q => q.category === targetExam.category);
+            }
+            if(examQs.length < targetExam.qLimit) {
                 alert("পরীক্ষার জন্য পর্যাপ্ত প্রশ্ন প্রস্তুত নেই। এডমিনের সাথে যোগাযোগ করুন।");
                 return;
             }
-            activeQuizQuestions = examQs.sort(() => 0.5 - Math.random()).slice(0, officialExamConfig.examQLimit);
+
+            // অফিশিয়াল পরীক্ষার আইডি ও টাইটেল সেট আপ
+            currentExamId = targetExam.id;
+            currentExamTitle = targetExam.title;
+            userSelectedAnswers = {};
+
+            activeQuizQuestions = examQs.sort(() => 0.5 - Math.random()).slice(0, targetExam.qLimit);
             document.getElementById("user-portal").classList.add("hidden");
             document.getElementById("quiz-screen").classList.remove("hidden");
-            setupTimer(officialExamConfig.examTimeLimit.toString());
+            
+            setupTimer(targetExam.timeLimit.toString());
+            
             currentQuestionIndex = 0;
             correctAnswers = 0;
             wrongAnswers = 0;
             loadQuestion();
+        }
+
+        // ইউজার রেজাল্ট ও উত্তরপত্র মডাল হিস্ট্রি সেকশন লোডিং (ড্যাশবোর্ড ইন্টিগ্রেশন)
+        async function loadUserResultsHistory() {
+            const container = document.getElementById("user-results-history-list");
+            if (!container) return;
+            container.innerHTML = "<p class='text-center text-xs text-gray-400 py-6'>রেকর্ড লোড হচ্ছে...</p>";
+            try {
+                const q = query(collection(db, "exam_attempts"), where("userPhone", "==", currentUserPhone));
+                const qSnap = await getDocs(q);
+                container.innerHTML = "";
+                if (qSnap.size === 0) {
+                    container.innerHTML = "<p class='text-center text-xs text-gray-400 py-6'>কোনো অফিশিয়াল পরীক্ষার রেকর্ড পাওয়া যায়নি।</p>";
+                    return;
+                }
+
+                // লাইভ ড্যাশবোর্ড থেকে রিয়েল-টাইম অফিশিয়াল এক্সামগুলোর এক্সপায়ারি টাইম যাচাই করার জন্য সম্পূর্ণ ডাটা রিকোয়েস্ট
+                const examsSnap = await getDocs(collection(db, "official_exams"));
+                const expiryMap = {};
+                examsSnap.forEach(docSnap => {
+                    expiryMap[docSnap.id] = new Date(docSnap.data().expiryTime);
+                });
+
+                qSnap.forEach(docSnap => {
+                    const attempt = docSnap.data();
+                    const examExpiry = expiryMap[attempt.examId] || null;
+                    const now = new Date();
+                    const isExpired = examExpiry ? now > examExpiry : true; // যদি অফিশিয়াল পরীক্ষা ডিলিট হয়ে যায় তবে মেয়াদ উত্তীর্ণ হিসেবে ধরা হবে
+
+                    const item = document.createElement("div");
+                    item.className = "py-3 flex flex-col gap-1 text-xs last:border-none";
+                    item.innerHTML = `
+                        <div class="flex justify-between items-start gap-2">
+                            <span class="font-bold text-gray-800 text-sm">${attempt.examTitle}</span>
+                            <span class="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-[10px] font-bold">প্রাপ্ত নম্বর: ${attempt.score}</span>
+                        </div>
+                        <p class="text-gray-500 text-[10px]">সঠিক: ${attempt.correct} | ভুল: ${attempt.wrong} | স্কিপ: ${attempt.skipped}</p>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-gray-400 text-[10px]">${attempt.submittedAt ? attempt.submittedAt.split("T")[0] : ""}</span>
+                            ${isExpired ? `
+                                <button onclick="openAttemptDetailsModal('${docSnap.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-1.5 rounded-lg transition text-[10px]">
+                                    উত্তরপত্র ও ব্যাখ্যা বিশ্লেষণ দেখুন ➔
+                                </button>
+                            ` : `
+                                <span class="bg-amber-50 text-amber-800 border border-amber-200 text-[10px] px-2 py-1 rounded-lg font-semibold">
+                                    ⏱️ সময় শেষ হওয়ার পর উত্তরপত্র দেখা যাবে
+                                </span>
+                            `}
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch(e) {
+                console.error("হিস্ট্রি লোডেড ত্রুটি:", e);
+                container.innerHTML = "<p class='text-center text-red-500 text-xs py-4'>রেকর্ড লোড করতে সমস্যা হয়েছে!</p>";
+            }
+        }
+
+        // উত্তরপত্র বিশ্লেষণের মডাল রেন্ডারিং
+        window.openAttemptDetailsModal = async function(attemptId) {
+            const listContainer = document.getElementById("attempt-questions-analysis-list");
+            document.getElementById("attempt-details-modal").classList.remove("hidden");
+            listContainer.innerHTML = "<p class='text-center text-xs text-gray-400 py-4'>বিশ্লেষণ লোড হচ্ছে...</p>";
+
+            try {
+                const docSnap = await getDoc(doc(db, "exam_attempts", attemptId));
+                if (!docSnap.exists()) {
+                    listContainer.innerHTML = "<p class='text-center text-xs text-red-500 py-4'>তথ্য খুঁজে পাওয়া যায়নি!</p>";
+                    return;
+                }
+                const attempt = docSnap.data();
+                document.getElementById("attempt-modal-title").innerText = attempt.examTitle;
+                listContainer.innerHTML = "";
+
+                const userAnsMap = attempt.userAnswers || {};
+                const qList = attempt.quizQuestions || [];
+
+                qList.forEach((q, idx) => {
+                    const userSelectedOptionKey = userAnsMap[q.id] || "skipped";
+                    const isCorrect = userSelectedOptionKey === q.correct;
+                    const isSkipped = userSelectedOptionKey === "skipped";
+
+                    let statusText = "❌ ভুল উত্তর";
+                    let statusColor = "text-red-700 bg-red-50 border-red-200";
+                    if (isCorrect) {
+                        statusText = "✅ সঠিক উত্তর";
+                        statusColor = "text-green-800 bg-green-50 border-green-200";
+                    } else if (isSkipped) {
+                        statusText = "🟡 স্কিপ করা হয়েছে";
+                        statusColor = "text-amber-800 bg-amber-50 border-amber-200";
+                    }
+
+                    // অপশনগুলোর টেক্সট রিকভার করা
+                    let userSelectedText = "উত্তর দেওয়া হয়নি (Skipped)";
+                    if (userSelectedOptionKey === "Option A") userSelectedText = q.optionA;
+                    else if (userSelectedOptionKey === "Option B") userSelectedText = q.optionB;
+                    else if (userSelectedOptionKey === "Option C") userSelectedText = q.optionC;
+                    else if (userSelectedOptionKey === "Option D") userSelectedText = q.optionD;
+
+                    let correctText = "";
+                    if (q.correct === "Option A") correctText = q.optionA;
+                    else if (q.correct === "Option B") correctText = q.optionB;
+                    else if (q.correct === "Option C") correctText = q.optionC;
+                    else if (q.correct === "Option D") correctText = q.optionD;
+
+                    const item = document.createElement("div");
+                    item.className = "py-3 flex flex-col gap-1 text-xs";
+                    item.innerHTML = `
+                        <div class="font-bold text-gray-800 leading-snug">${idx + 1}. ${q.text}</div>
+                        <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 mt-1 text-gray-500 text-[11px]">
+                            <div>ক) ${q.optionA}</div>
+                            <div>খ) ${q.optionB}</div>
+                            <div>গ) ${q.optionC}</div>
+                            <div>ঘ) ${q.optionD}</div>
+                        </div>
+                        <div class="border rounded-xl p-2.5 mt-2 flex flex-col gap-1 ${statusColor}">
+                            <div class="font-bold text-[11px]">${statusText}</div>
+                            <div class="text-[11px]">আপনার উত্তর: <span class="font-semibold">${userSelectedText}</span></div>
+                            <div class="text-[11px]">সঠিক উত্তর: <span class="font-bold">${correctText}</span></div>
+                            ${q.explanation ? `<p class="text-gray-600 text-[10px] mt-1 pt-1 border-t leading-relaxed"><b class="text-amber-800">ব্যাখ্যা:</b> ${q.explanation}</p>` : ""}
+                        </div>
+                    `;
+                    listContainer.appendChild(item);
+                });
+            } catch(e) {
+                console.error(e);
+                listContainer.innerHTML = "<p class='text-center text-red-500 py-4'>ডাটা লোড করার সময় ত্রুটি ঘটেছে!</p>";
+            }
+        }
+
+        window.closeAttemptDetailsModal = function() {
+            document.getElementById("attempt-details-modal").classList.add("hidden");
         }
 
         window.openFullScreenReader = function() {
@@ -2221,13 +2667,7 @@
         }
 
         window.goToLiveExamZone = function() {
-            if (typeof switchDrawerSection === 'function') {
-                switchDrawerSection('live-exam'); 
-            } else {
-                document.querySelectorAll('.drawer-sec').forEach(sec => sec.classList.add('hidden'));
-                const targetSec = document.getElementById('drawer-sec-live-exam');
-                if (targetSec) targetSec.classList.remove('hidden');
-            }
+            switchDrawerSection('live-exam');
         }
     </script>
 </body>
