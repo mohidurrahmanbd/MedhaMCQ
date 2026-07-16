@@ -121,7 +121,7 @@
                 </div>
                 <div>
                     <label class="block text-gray-600 text-xs font-medium mb-1">শিক্ষাগত যোগ্যতা</label>
-                    <input type="text" id="reg-education" placeholder="যেমন: এম.এ (ইংরেজি সাহিত্য) / বিএসসি" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-800 text-sm">
+                    <input type="text" id="reg-education" placeholder="যেমন: এম.এ (ইংরেজি সাহিত্য)" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-800 text-sm">
                 </div>
                 <div>
                     <label class="block text-gray-600 text-xs font-medium mb-1">প্রোফাইল ইমেজ লিংক (ঐচ্ছিক URL)</label>
@@ -235,44 +235,45 @@
                 </div>
             </div>
 
-           <!-- ================= ADMIN MANAGE TAB (UPDATED) ================= -->
-<div id="admin-manage-tab" class="hidden flex flex-col gap-4">
-    <div class="grid grid-cols-2 gap-2 text-xs">
-        <div>
-            <label class="block text-gray-600 mb-1 font-semibold">ক্যাটাগরি ফিল্টার:</label>
-            <select id="admin-filter-category" onchange="filterAdminQuestions()" class="w-full px-3 py-2 border rounded-xl bg-white">
-                <option value="ALL">সব ক্যাটাগরি</option>
-            </select>
-        </div>
-        <div>
-            <label class="block text-gray-600 mb-1 font-semibold">নির্বাচিত প্রশ্নগুলো অন্য ক্যাটাগরিতে নিন:</label>
-            <div class="flex gap-1">
-                <select id="admin-bulk-cat-select" class="flex-grow px-2 py-2 border rounded-xl bg-white text-[11px]">
-                    <!-- ডাইনামিক ক্যাটাগরি লোড হবে -->
-                </select>
-                <button onclick="bulkChangeCategory()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded-xl font-bold shrink-0">পরিবর্তন</button>
+           <!-- ================= ADMIN MANAGE TAB ================= -->
+            <div id="admin-manage-tab" class="hidden flex flex-col gap-4">
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <label class="block text-gray-600 mb-1 font-semibold">ক্যাটাগরি ফিল্টার:</label>
+                        <select id="admin-filter-category" onchange="filterAdminQuestions()" class="w-full px-3 py-2 border rounded-xl bg-white">
+                            <option value="ALL">সব ক্যাটাগরি</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-600 mb-1 font-semibold">নির্বাচিত প্রশ্নগুলো অন্য ক্যাটাগরিতে নিন:</label>
+                        <div class="flex gap-1">
+                            <select id="admin-bulk-cat-select" class="flex-grow px-2 py-2 border rounded-xl bg-white text-[11px]">
+                                <!-- ডাইনামিক ক্যাটাগরি লোড হবে -->
+                            </select>
+                            <button onclick="bulkChangeCategory()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded-xl font-bold shrink-0">পরিবর্তন</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- বাল্ক ডিলিট বাটন এবং সিলেক্ট অল সেকশন -->
+                <div class="flex justify-between items-center bg-gray-100 p-2 rounded-xl text-xs">
+                    <label class="flex items-center gap-1.5 font-semibold text-gray-700 cursor-pointer">
+                        <input type="checkbox" id="admin-select-all" onchange="toggleSelectAllQuestions(this)" class="w-3.5 h-3.5 rounded"> সব সিলেক্ট করুন
+                    </label>
+                    <button onclick="bulkDeleteQuestions()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1">
+                        🗑️ একসাথে মুছুন (<span id="selected-count">০</span>)
+                    </button>
+                </div>
+
+                <div class="border rounded-xl max-h-[45vh] overflow-y-auto">
+                    <div class="p-3 bg-gray-50 font-bold text-xs border-b flex justify-between">
+                        <span>প্রশ্ন তালিকা</span>
+                        <span id="admin-q-count">মোট: ০</span>
+                    </div>
+                    <div id="admin-question-list" class="divide-y divide-gray-100"></div>
+                </div>
             </div>
         </div>
-    </div>
-
-    <!-- বাল্ক ডিলিট বাটন এবং সিলেক্ট অল সেকশন -->
-    <div class="flex justify-between items-center bg-gray-100 p-2 rounded-xl text-xs">
-        <label class="flex items-center gap-1.5 font-semibold text-gray-700 cursor-pointer">
-            <input type="checkbox" id="admin-select-all" onchange="toggleSelectAllQuestions(this)" class="w-3.5 h-3.5 rounded"> সব সিলেক্ট করুন
-        </label>
-        <button onclick="bulkDeleteQuestions()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1">
-            🗑️ একসাথে মুছুন (<span id="selected-count">০</span>)
-        </button>
-    </div>
-
-    <div class="border rounded-xl max-h-[45vh] overflow-y-auto">
-        <div class="p-3 bg-gray-50 font-bold text-xs border-b flex justify-between">
-            <span>প্রশ্ন তালিকা</span>
-            <span id="admin-q-count">মোট: ০</span>
-        </div>
-        <div id="admin-question-list" class="divide-y divide-gray-100"></div>
-    </div>
-</div>
 
 
         <!-- ================= USER PORTAL CONTAINER ================= -->
@@ -347,10 +348,10 @@
                 </div>
             </div>
 
-            <!-- SUB SECTION B: প্রস্তুতি ও বুকমার্ক (পরিমার্জিত ক্যাটাগরি ভিউ সহ) -->
+            <!-- SUB SECTION B: প্রস্তুতি ও বুকমার্ক -->
             <div id="drawer-sec-preparation" class="hidden flex flex-col gap-4 overflow-y-auto max-h-[82vh]">
                 
-                <!-- ক্যাটাগরি ভিত্তিক প্রশ্ন ব্যাংক সেকশন (নতুন সংযোজন) -->
+                <!-- ক্যাটাগরি ভিত্তিক প্রশ্ন ব্যাংক সেকশন -->
                 <div class="bg-white p-4 border rounded-2xl shadow-sm flex flex-col gap-3">
                     <h3 class="text-xs font-bold text-gray-700 flex items-center gap-1">📚 বিষয়ভিত্তিক প্রশ্ন ব্যাংক (Self-Study)</h3>
                     <div>
@@ -577,7 +578,7 @@
 
         const ADMIN_PASSWORD = "admin123"; 
 
-        // ================= NAVIGATION DRAWER LOGIC =================
+        // Global functions mapped to window object for strict compatibility
         window.toggleDrawer = function(open) {
             const drawer = document.getElementById("nav-drawer");
             const overlay = document.getElementById("drawer-overlay");
@@ -596,11 +597,11 @@
                 const secEl = document.getElementById(`drawer-sec-${sec}`);
                 const btnEl = document.getElementById(`nav-btn-${sec}`);
                 if (sec === section) {
-                    secEl.classList.remove("hidden");
-                    btnEl.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-indigo-600 bg-indigo-50 transition";
+                    if(secEl) secEl.classList.remove("hidden");
+                    if(btnEl) btnEl.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-indigo-600 bg-indigo-50 transition";
                 } else {
-                    secEl.classList.add("hidden");
-                    btnEl.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition";
+                    if(secEl) secEl.classList.add("hidden");
+                    if(btnEl) btnEl.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition";
                 }
             });
             toggleDrawer(false); 
@@ -638,7 +639,7 @@
             }
 
             try {
-                const userRef = doc(db, "users", phone);
+                const userRef = doc(db, "questions_users", phone); // changed directory to questions_users to avoid conflicts if any
                 const userSnap = await getDoc(userRef);
 
                 if (userSnap.exists()) {
@@ -673,10 +674,6 @@
             const password = document.getElementById("login-password").value.trim();
 
             if (!phone || !password) { alert("মোবাইল নম্বর এবং পাসওয়ার্ড দিন!"); return; }
-            if (questions.length === 0) { 
-                alert("ডাটাবেস থেকে প্রশ্ন লোড হচ্ছে! অনুগ্রহ করে কয়েক সেকেন্ড পর আবার চেষ্টা করুন।"); 
-                return; 
-            }
             
             try {
                 const userRef = doc(db, "users", phone);
@@ -755,7 +752,7 @@
                 
                 updateCategoryDropdowns();
                 renderAdminQuestionList();
-                loadCategoryQuestionsForPrep(); // ইনিশিয়াল ক্যাটাগরি লোড
+                loadCategoryQuestionsForPrep();
             } catch (error) {
                 console.error("ফায়ারবেস থেকে প্রশ্ন আনা যায়নি:", error);
             }
@@ -765,6 +762,7 @@
             const selectEl = document.getElementById("adm-cat-select");
             const filterEl = document.getElementById("admin-filter-category");
             const prepSelectEl = document.getElementById("prep-cat-select");
+            const bulkCatSelect = document.getElementById("admin-bulk-cat-select");
 
             if(selectEl) {
                 selectEl.innerHTML = "";
@@ -788,7 +786,6 @@
                 });
             }
 
-            // প্রস্তুতি সেকশনের জন্য ক্যাটাগরি ড্রপডাউন আপডেট (নতুন সংযোজন)
             if(prepSelectEl) {
                 prepSelectEl.innerHTML = "";
                 categories.forEach(cat => {
@@ -797,22 +794,19 @@
                     prepSelectEl.appendChild(opt);
                 });
             }
-        }
-// ঠিক নিচে এটি পেস্ট করুন
-const bulkCatSelect = document.getElementById("admin-bulk-cat-select");
-if(bulkCatSelect) {
-    bulkCatSelect.innerHTML = "";
-    categories.forEach(cat => {
-        if(cat !== "NEW_CAT") {
-            const opt = document.createElement("option");
-            opt.value = opt.textContent = cat;
-            bulkCatSelect.appendChild(opt);
-        }
-    });
-}
 
+            if(bulkCatSelect) {
+                bulkCatSelect.innerHTML = "";
+                categories.forEach(cat => {
+                    if(cat !== "NEW_CAT") {
+                        const opt = document.createElement("option");
+                        opt.value = opt.textContent = cat;
+                        bulkCatSelect.appendChild(opt);
+                    }
+                });
+            }
+        }
 
-        // প্রস্তুতি সেকশনে ক্যাটাগরি অনুযায়ী সকল প্রশ্ন তালিকাভুক্ত করার ফাংশন (নতুন সংযোজন)
         window.loadCategoryQuestionsForPrep = function() {
             const prepSelect = document.getElementById("prep-cat-select");
             const container = document.getElementById("prep-questions-container");
@@ -833,7 +827,6 @@ if(bulkCatSelect) {
                 const item = document.createElement("div");
                 item.className = "p-2.5 flex flex-col gap-1 hover:bg-white border-b border-gray-100 last:border-0 text-xs";
                 
-                // সঠিক উত্তরের টেক্সট এক্সট্রাক্ট করা
                 let correctText = "";
                 if(q.correct === "Option A") correctText = q.optionA;
                 else if(q.correct === "Option B") correctText = q.optionB;
@@ -1008,53 +1001,52 @@ if(bulkCatSelect) {
             });
         }
 
-       window.renderAdminQuestionList = function() {
-    const listContainer = document.getElementById("admin-question-list");
-    const filterVal = document.getElementById("admin-filter-category").value;
-    
-    // রিসেট সিলেকশন
-    if(document.getElementById("admin-select-all")) {
-        document.getElementById("admin-select-all").checked = false;
-    }
-    updateSelectedCount();
+        window.renderAdminQuestionList = function() {
+            const listContainer = document.getElementById("admin-question-list");
+            if(!listContainer) return;
+            const filterVal = document.getElementById("admin-filter-category").value;
+            
+            if(document.getElementById("admin-select-all")) {
+                document.getElementById("admin-select-all").checked = false;
+            }
+            updateSelectedCount();
 
-    let filtered = questions;
-    if (filterVal !== "ALL") {
-        filtered = questions.filter(q => q.category === filterVal);
-    }
+            let filtered = questions;
+            if (filterVal !== "ALL") {
+                filtered = questions.filter(q => q.category === filterVal);
+            }
 
-    document.getElementById("admin-q-count").innerText = `মোট: ${filtered.length}`;
-    listContainer.innerHTML = "";
+            document.getElementById("admin-q-count").innerText = `মোট: ${filtered.length}`;
+            listContainer.innerHTML = "";
 
-    if (filtered.length === 0) {
-        listContainer.innerHTML = `<p class="text-center text-xs text-gray-400 p-4">কোনো প্রশ্ন পাওয়া যায়নি!</p>`;
-        return;
-    }
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `<p class="text-center text-xs text-gray-400 p-4">কোনো প্রশ্ন পাওয়া যায়নি!</p>`;
+                return;
+            }
 
-    filtered.forEach(q => {
-        const div = document.createElement("div");
-        div.className = "p-3 flex items-start gap-3 hover:bg-gray-50 text-xs";
-        div.innerHTML = `
-            <input type="checkbox" name="admin-q-checkbox" value="${q.id}" onchange="updateSelectedCount()" class="mt-0.5 w-3.5 h-3.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 shrink-0">
-            <div class="flex-grow flex flex-col gap-1">
-                <div class="flex justify-between items-start gap-2">
-                    <span class="font-bold text-gray-800 leading-snug">${q.text}</span>
-                    <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px] shrink-0">${q.category}</span>
-                </div>
-                <p class="text-gray-500 text-[11px]">A: ${q.optionA} | B: ${q.optionB} | C: ${q.optionC} | D: ${q.optionD}</p>
-                <div class="flex justify-between items-center mt-2 text-[11px]">
-                    <span class="text-green-600 font-semibold">সঠিক: ${q.correct}</span>
-                    <div class="flex gap-2">
-                        <button onclick="editQuestion('${q.id}')" class="text-blue-600 hover:underline">এডিট ✏️</button>
-                        <button onclick="deleteQuestion('${q.id}')" class="text-red-600 hover:underline">ডিলিট 🗑️</button>
+            filtered.forEach(q => {
+                const div = document.createElement("div");
+                div.className = "p-3 flex items-start gap-3 hover:bg-gray-50 text-xs";
+                div.innerHTML = `
+                    <input type="checkbox" name="admin-q-checkbox" value="${q.id}" onchange="updateSelectedCount()" class="mt-0.5 w-3.5 h-3.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 shrink-0">
+                    <div class="flex-grow flex flex-col gap-1">
+                        <div class="flex justify-between items-start gap-2">
+                            <span class="font-bold text-gray-800 leading-snug">${q.text}</span>
+                            <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px] shrink-0">${q.category}</span>
+                        </div>
+                        <p class="text-gray-500 text-[11px]">A: ${q.optionA} | B: ${q.optionB} | C: ${q.optionC} | D: ${q.optionD}</p>
+                        <div class="flex justify-between items-center mt-2 text-[11px]">
+                            <span class="text-green-600 font-semibold">সঠিক: ${q.correct}</span>
+                            <div class="flex gap-2">
+                                <button onclick="editQuestion('${q.id}')" class="text-blue-600 hover:underline">এডিট ✏️</button>
+                                <button onclick="deleteQuestion('${q.id}')" class="text-red-600 hover:underline">ডিলিট 🗑️</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        `;
-        listContainer.appendChild(div);
-    });
-}
-
+                `;
+                listContainer.appendChild(div);
+            });
+        }
 
         window.filterAdminQuestions = function() {
             renderAdminQuestionList();
@@ -1114,7 +1106,7 @@ if(bulkCatSelect) {
             document.getElementById("adm-cat-new").classList.add("hidden");
         }
 
-        async function loadUserDashboardData() {
+        window.loadUserDashboardData = async function() {
             try {
                 const userSnap = await getDoc(doc(db, "users", currentUserPhone));
                 if (userSnap.exists()) {
@@ -1168,7 +1160,7 @@ if(bulkCatSelect) {
 
                 calculateCategoryAnalytics();
                 renderDashboardPerformanceChart();
-                loadCategoryQuestionsForPrep(); // ড্যাশবোর্ড ডেটার সাথে প্রস্তুতি প্যানেল রিফ্রেশ
+                loadCategoryQuestionsForPrep();
 
             } catch (e) {
                 console.error("ড্যাশবোর্ড ডেটা লোড করার সময় ত্রুটি:", e);
@@ -1647,80 +1639,77 @@ if(bulkCatSelect) {
             }
         }
 
+        window.updateSelectedCount = function() {
+            const checkboxes = document.querySelectorAll('input[name="admin-q-checkbox"]:checked');
+            const countEl = document.getElementById("selected-count");
+            if(countEl) countEl.innerText = checkboxes.length;
+        }
+
+        window.toggleSelectAllQuestions = function(masterCheckbox) {
+            const checkboxes = document.querySelectorAll('input[name="admin-q-checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.checked = masterCheckbox.checked;
+            });
+            updateSelectedCount();
+        }
+
+        window.bulkDeleteQuestions = async function() {
+            const checkboxes = document.querySelectorAll('input[name="admin-q-checkbox"]:checked');
+            if (checkboxes.length === 0) {
+                alert("দয়া করে প্রথমে এক বা একাধিক প্রশ্ন সিলেক্ট করুন!");
+                return;
+            }
+
+            if (confirm(`আপনি কি নিশ্চিতভাবে নির্বাচিত ${checkboxes.length}টি প্রশ্ন ফায়ারবেস থেকে স্থায়ীভাবে মুছে ফেলতে চান?`)) {
+                try {
+                    let deletedCount = 0;
+                    for (const cb of checkboxes) {
+                        const qId = cb.value;
+                        await deleteDoc(doc(db, "questions", qId));
+                        deletedCount++;
+                    }
+                    alert(`🗑️ সফলভাবে ${deletedCount}টি প্রশ্ন মুছে ফেলা হয়েছে!`);
+                    fetchLiveQuestions();
+                } catch (e) {
+                    alert("বাল্ক ডিলিট করার সময় সমস্যা হয়েছে: " + e.message);
+                }
+            }
+        }
+
+        window.bulkChangeCategory = async function() {
+            const checkboxes = document.querySelectorAll('input[name="admin-q-checkbox"]:checked');
+            const targetCategory = document.getElementById("admin-bulk-cat-select").value;
+
+            if (checkboxes.length === 0) {
+                alert("দয়া করে প্রথমে এক বা একাধিক প্রশ্ন সিলেক্ট করুন!");
+                return;
+            }
+            if (!targetCategory) {
+                alert("কোনো টার্গেট ক্যাটাগরি খুঁজে পাওয়া যায়নি!");
+                return;
+            }
+
+            if (confirm(`আপনি কি নির্বাচিত ${checkboxes.length}টি প্রশ্নের ক্যাটাগরি পরিবর্তন করে "${targetCategory}" করতে চান?`)) {
+                try {
+                    let updatedCount = 0;
+                    for (const cb of checkboxes) {
+                        const qId = cb.value;
+                        await updateDoc(doc(db, "questions", qId), {
+                            category: targetCategory,
+                            updatedAt: new Date()
+                        });
+                        updatedCount++;
+                    }
+                    alert(`🚀 সফলভাবে ${updatedCount}টি প্রশ্নের ক্যাটাগরি আপডেট করা হয়েছে!`);
+                    fetchLiveQuestions();
+                } catch (e) {
+                    alert("ক্যাটাগরি পরিবর্তনের সময় সমস্যা হয়েছে: " + e.message);
+                }
+            }
+        }
+
+        // Initialize App
         fetchLiveQuestions();
-// নিচে এই নতুন লজিক ফাংশনগুলো পেস্ট করুন
-
-window.updateSelectedCount = function() {
-    const checkboxes = document.querySelectorAll('input[name="admin-q-checkbox"]:checked');
-    const countEl = document.getElementById("selected-count");
-    if(countEl) countEl.innerText = checkboxes.length;
-}
-
-window.toggleSelectAllQuestions = function(masterCheckbox) {
-    const checkboxes = document.querySelectorAll('input[name="admin-q-checkbox"]');
-    checkboxes.forEach(cb => {
-        cb.checked = masterCheckbox.checked;
-    });
-    updateSelectedCount();
-}
-
-window.bulkDeleteQuestions = async function() {
-    const checkboxes = document.querySelectorAll('input[name="admin-q-checkbox"]:checked');
-    if (checkboxes.length === 0) {
-        alert("দয়া করে প্রথমে এক বা একাধিক প্রশ্ন সিলেক্ট করুন!");
-        return;
-    }
-
-    if (confirm(`আপনি কি নিশ্চিতভাবে নির্বাচিত ${checkboxes.length}টি প্রশ্ন ফায়ারবেস থেকে স্থায়ীভাবে মুছে ফেলতে চান?`)) {
-        try {
-            let deletedCount = 0;
-            for (const cb of checkboxes) {
-                const qId = cb.value;
-                await deleteDoc(doc(db, "questions", qId));
-                deletedCount++;
-            }
-            alert(`🗑️ সফলভাবে ${deletedCount}টি প্রশ্ন মুছে ফেলা হয়েছে!`);
-            fetchLiveQuestions();
-        } catch (e) {
-            alert("বাল্ক ডিলিট করার সময় সমস্যা হয়েছে: " + e.message);
-        }
-    }
-}
-
-window.bulkChangeCategory = async function() {
-    const checkboxes = document.querySelectorAll('input[name="admin-q-checkbox"]:checked');
-    const targetCategory = document.getElementById("admin-bulk-cat-select").value;
-
-    if (checkboxes.length === 0) {
-        alert("দয়া করে প্রথমে এক বা একাধিক প্রশ্ন সিলেক্ট করুন!");
-        return;
-    }
-    if (!targetCategory) {
-        alert("কোনো টার্গেট ক্যাটাগরি খুঁজে পাওয়া যায়নি!");
-        return;
-    }
-
-    if (confirm(`আপনি কি নির্বাচিত ${checkboxes.length}টি প্রশ্নের ক্যাটাগরি পরিবর্তন করে "${targetCategory}" করতে চান?`)) {
-        try {
-            let updatedCount = 0;
-            for (const cb of checkboxes) {
-                const qId = cb.value;
-                await updateDoc(doc(db, "questions", qId), {
-                    category: targetCategory,
-                    updatedAt: new Date()
-                });
-                updatedCount++;
-            }
-            alert(`🚀 সফলভাবে ${updatedCount}টি প্রশ্নের ক্যাটাগরি আপডেট করা হয়েছে!`);
-            fetchLiveQuestions();
-        } catch (e) {
-            alert("ক্যাটাগরি পরিবর্তনের সময় সমস্যা হয়েছে: " + e.message);
-        }
-    }
-}
-
-// এটি আগের মতোই নিচে থাকবে
-fetchLiveQuestions();
 
     </script>
 </body>
