@@ -161,7 +161,6 @@
                         <textarea id="adm-explain" rows="2" class="w-full px-3 py-2 border rounded-xl" placeholder="উত্তরটির সঠিক ব্যাখ্যা দিন..."></textarea>
                     </div>
                     
-                    <!-- ক্যাটাগরি ও সাব-ক্যাটাগরি সেকশন -->
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block text-gray-600 mb-1 font-medium">প্রধান ক্যাটাগরি:</label>
@@ -218,6 +217,24 @@
                 <button onclick="logoutUser()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition">লগআউট</button>
             </div>
 
+            <!-- [NEW FEATURE] ক্যাটাগরি ভিত্তিক রিডিং ও কুইজ জোন মেনু -->
+            <div class="bg-gradient-to-r from-indigo-50 to-blue-50 p-4 border rounded-2xl shadow-sm flex flex-col gap-2">
+                <h3 class="text-xs font-bold text-indigo-900 flex items-center gap-1">📖 ক্যাটাগরি ওয়াইজ স্টাডি ও কুইজ জোন</h3>
+                <div class="flex flex-col gap-2">
+                    <select id="study-zone-category" class="w-full px-3 py-2 border rounded-xl bg-white text-xs font-medium text-gray-700">
+                        <!-- ডাইনামিক ক্যাটাগরি এখানে লোড হবে -->
+                    </select>
+                    <div class="grid grid-cols-2 gap-2 mt-1">
+                        <button onclick="startReadingMode()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-xs transition shadow-sm">
+                            📚 রিডিং মোড (উত্তর ও ব্যাখ্যা সহ)
+                        </button>
+                        <button onclick="startCategoryQuizMode()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-xl text-xs transition shadow-sm">
+                            📝 কুইজ মোড (পরীক্ষা দিন)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- লাইফটাইম আজীবন পরিসংখ্যান বোর্ড -->
             <div class="bg-indigo-900 text-white p-4 rounded-2xl shadow-md">
                 <h4 class="text-xs font-bold opacity-75 mb-2 flex items-center gap-1">🌐 আজীবন সামগ্রিক রিপোর্ট (Lifetime History)</h4>
@@ -253,7 +270,7 @@
             </div>
 
             <div class="bg-white p-4 border rounded-2xl shadow-sm flex flex-col items-center">
-                <h3 class="text-xs font-bold text-gray-700 self-start mb-2">📊 পারফরম্যান্স গ্রাফ (সদস্য পরিসংখ্যান)</h3>
+                <h3 class="text-xs font-bold text-gray-700 self-start mb-2">📊 পারফরম্যান্স গ্রাফ</h3>
                 <div class="w-full h-40">
                     <canvas id="dashboardChart"></canvas>
                 </div>
@@ -274,15 +291,36 @@
             </div>
 
             <!-- মূল অ্যাকশন বাটন সমূহ -->
-            <button onclick="openSetupModal(false)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl text-sm shadow-md shadow-indigo-100 transition">
-                🚀 পরীক্ষা শুরু করুন
+            <button onclick="openSetupModal(false)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl text-sm shadow-md transition">
+                🚀 র্যান্ডম মিক্সড পরীক্ষা শুরু করুন
             </button>
             <button onclick="openSetupModal(true)" id="incorrect-rev-btn" class="hidden w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs transition">
                 ⚠️ ভুল করা প্রশ্নের ওপর পরীক্ষা দিন
             </button>
-            <button onclick="openHistoryModal()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 rounded-xl text-xs transition shadow-sm">
+            <button onclick="openHistoryModal()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 rounded-xl text-xs transition">
                 📜 অতীত পরীক্ষার ওএমআর আর্কাইভ (History)
             </button>
+        </div>
+
+        <!-- ================= READING MODE SCREEN ================= -->
+        <div id="reading-screen" class="hidden flex-grow flex flex-col justify-between overflow-y-auto max-h-[95vh]">
+            <div class="flex justify-between items-center pb-3 border-b">
+                <div>
+                    <h2 class="text-sm font-bold text-emerald-700">📚 স্টাডি / রিডিং মোড</h2>
+                    <span id="reading-cat-display" class="text-xs text-gray-400">ক্যাটাগরি</span>
+                </div>
+                <button onclick="exitReadingMode()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition">ফিরে যান</button>
+            </div>
+            
+            <div id="reading-list-container" class="my-4 flex flex-col gap-6 overflow-y-auto flex-grow max-h-[70vh] pr-1">
+                <!-- প্রশ্ন, সঠিক উত্তর ও ব্যাখ্যা সহ এখানে কার্ড জেনারেট হবে -->
+            </div>
+            
+            <div class="border-t pt-2">
+                <button onclick="exitReadingMode()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 rounded-xl text-xs transition">
+                    পড়া শেষ করে ড্যাশবোর্ডে ফিরুন
+                </button>
+            </div>
         </div>
 
         <!-- ================= EXAM SETUP CONFIG MODAL ================= -->
@@ -293,7 +331,6 @@
                     <button onclick="closeSetupModal()" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
                 </div>
                 
-                <!-- প্রশ্নের সংখ্যা সেট করা -->
                 <div>
                     <label class="block text-xs font-bold text-gray-600 mb-2">১. কতটি প্রশ্নে পরীক্ষা দিতে চান?</label>
                     <select id="setup-q-limit" class="w-full px-3 py-2 border rounded-xl bg-white text-sm">
@@ -304,7 +341,6 @@
                     </select>
                 </div>
 
-                <!-- সময়সীমা সেট করা -->
                 <div>
                     <label class="block text-xs font-bold text-gray-600 mb-2">২. সময়সীমা নির্ধারণ করুন:</label>
                     <select id="setup-time-limit" class="w-full px-3 py-2 border rounded-xl bg-white text-sm">
@@ -316,7 +352,6 @@
                     </select>
                 </div>
 
-                <!-- নেগেটিভ মার্কিং ডাইনামিক অপশন -->
                 <div>
                     <label class="block text-xs font-bold text-gray-600 mb-2">৩. পরীক্ষার ধরন ও নেগেটিভ মার্কিং:</label>
                     <select id="setup-negative-mark" class="w-full px-3 py-2 border rounded-xl bg-white text-sm">
@@ -350,7 +385,7 @@
             </div>
 
             <div class="my-6">
-                <h3 id="question-text" class="text-lg font-bold text-gray-800 leading-snug">লোড হচ্ছে...</h3>
+                <h3 id="question-text" class="text-lg font-bold text-gray-800 leading-snug">로드 হচ্ছে...</h3>
             </div>
 
             <div class="flex flex-col gap-3" id="options-container"></div>
@@ -391,9 +426,9 @@
             </div>
 
             <div class="flex-grow mt-2">
-                <h3 class="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">🏆 গ্লোবাল লিডারবোর্ড (শীর্ষ ১০ জন)</h3>
+                <h3 class="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">🏆 গলোবাল লিডারবোর্ড (শীর্ষ ১০ জন)</h3>
                 <div class="max-h-40 overflow-y-auto border border-gray-100 rounded-xl" id="leaderboard-list">
-                    <p class="text-center text-xs text-gray-400 p-4">লোড হচ্ছে...</p>
+                    <p class="text-center text-xs text-gray-400 p-4">로드 হচ্ছে...</p>
                 </div>
             </div>
 
@@ -471,6 +506,16 @@
         let userSelectedAnswersLog = {}; 
 
         const ADMIN_PASSWORD = "admin123"; 
+
+        // ================= CONFIRMATION BEFORE EXITING APP (NAVIGATION GUARD) =================
+        window.addEventListener('beforeunload', function (e) {
+            // যদি ইউজার লগইন অবস্থায় থাকে তবে পেজ রিলোড বা ক্লোজ করতে গেলে সতর্কতা দেখাবে
+            if (currentUserPhone !== "") {
+                e.preventDefault();
+                e.returnValue = 'আপনি কি নিশ্চিত যে অ্যাপ থেকে বের হয়ে যাবেন? আপনার রানিং সেশন বা প্রগ্রেস হারিয়ে যেতে পারে।';
+                return e.returnValue;
+            }
+        });
 
         window.toggleAuthScreens = function(screen) {
             if(screen === 'register') {
@@ -566,11 +611,13 @@
         }
 
         window.logoutUser = function() {
-            currentUser = "";
-            currentUserPhone = "";
-            document.getElementById("user-portal").classList.add("hidden");
-            document.getElementById("login-screen").classList.remove("hidden");
-            document.getElementById("login-password").value = "";
+            if(confirm("আপনি কি নিশ্চিতভাবে লগআউট করতে চান?")) {
+                currentUser = "";
+                currentUserPhone = "";
+                document.getElementById("user-portal").classList.add("hidden");
+                document.getElementById("login-screen").classList.remove("hidden");
+                document.getElementById("login-password").value = "";
+            }
         }
 
         async function fetchLiveQuestions() {
@@ -607,6 +654,7 @@
         function updateCategoryDropdowns() {
             const selectEl = document.getElementById("adm-cat-select");
             const filterEl = document.getElementById("admin-filter-category");
+            const studyZoneSelect = document.getElementById("study-zone-category");
 
             if(selectEl) {
                 selectEl.innerHTML = "";
@@ -627,6 +675,16 @@
                     const opt = document.createElement("option");
                     opt.value = opt.textContent = cat;
                     filterEl.appendChild(opt);
+                });
+            }
+
+            // ড্যাশবোর্ডের স্টাডি জোন ড্রপডাউন আপডেট
+            if(studyZoneSelect) {
+                studyZoneSelect.innerHTML = "";
+                categories.forEach(cat => {
+                    const opt = document.createElement("option");
+                    opt.value = opt.textContent = cat;
+                    studyZoneSelect.appendChild(opt);
                 });
             }
         }
@@ -1025,13 +1083,93 @@
         }
 
 
+        // ================= [NEW FUNCTIONALITY] READING MODE & CATEGORY QUIZ =================
+
+        window.startReadingMode = function() {
+            const targetCat = document.getElementById("study-zone-category").value;
+            const targetQuestions = questions.filter(q => q.category === targetCat);
+
+            if (targetQuestions.length === 0) {
+                alert("এই ক্যাটাগরিতে কোনো প্রশ্ন পাওয়া যায়নি!");
+                return;
+            }
+
+            document.getElementById("user-portal").classList.add("hidden");
+            document.getElementById("reading-screen").classList.remove("hidden");
+            document.getElementById("reading-cat-display").innerText = `${targetCat} (মোট ${targetQuestions.length} টি প্রশ্ন)`;
+
+            const container = document.getElementById("reading-list-container");
+            container.innerHTML = "";
+
+            targetQuestions.forEach((q, idx) => {
+                const card = document.createElement("div");
+                card.className = "p-4 border border-gray-100 bg-white rounded-2xl shadow-sm flex flex-col gap-2 text-xs";
+                
+                // অপশনগুলো সাজানো এবং সঠিকটিকে হাইলাইট করার লজিক
+                let optAClass = q.correct === 'Option A' ? 'bg-green-50 border-green-500 font-bold text-green-800' : 'bg-gray-50 border-gray-100';
+                let optBClass = q.correct === 'Option B' ? 'bg-green-50 border-green-500 font-bold text-green-800' : 'bg-gray-50 border-gray-100';
+                let optCClass = q.correct === 'Option C' ? 'bg-green-50 border-green-500 font-bold text-green-800' : 'bg-gray-50 border-gray-100';
+                let optDClass = q.correct === 'Option D' ? 'bg-green-50 border-green-500 font-bold text-green-800' : 'bg-gray-50 border-gray-100';
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-bold text-sm text-gray-800 leading-snug">${idx+1}. ${q.text}</h4>
+                        ${q.subCategory ? `<span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[9px] font-semibold shrink-0">#${q.subCategory}</span>` : ''}
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-2 font-medium text-gray-700">
+                        <div class="p-2 border.2 rounded-lg ${optAClass}">A. ${q.optionA}</div>
+                        <div class="p-2 border-2 rounded-lg ${optBClass}">B. ${q.optionB}</div>
+                        <div class="p-2 border-2 rounded-lg ${optCClass}">C. ${q.optionC}</div>
+                        <div class="p-2 border-2 rounded-lg ${optDClass}">D. ${q.optionD}</div>
+                    </div>
+                    ${q.explanation ? `
+                    <div class="mt-1 p-3 bg-amber-50 rounded-xl border border-amber-100 text-gray-700">
+                        <b class="text-amber-800 block text-[10px] mb-0.5">💡 ব্যাখ্যা:</b> ${q.explanation}
+                    </div>` : ''}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        window.exitReadingMode = function() {
+            document.getElementById("reading-screen").classList.add("hidden");
+            document.getElementById("user-portal").classList.remove("hidden");
+        }
+
+        window.startCategoryQuizMode = function() {
+            const targetCat = document.getElementById("study-zone-category").value;
+            activeQuizQuestions = questions.filter(q => q.category === targetCat);
+
+            if (activeQuizQuestions.length === 0) {
+                alert("এই ক্যাটাগরিতে পরীক্ষা দেওয়ার মতো কোনো প্রশ্ন পাওয়া যায়নি!");
+                return;
+            }
+
+            isIncorrectRevisionMode = false;
+            // ক্যাটাগরি কুইজে সর্বোচ্চ প্রশ্নের সংখ্যা অটো-অ্যাসাইন
+            openSetupModal(false);
+            // ক্যাটাগরি ফিল্টার ঠিক রেখে মিক্সডের বদলে স্পেসিফিক কোয়েশ্চেন লোড রাখার ট্রিগার
+            activeQuizQuestions = activeQuizQuestions.sort(() => 0.5 - Math.random());
+        }
+
+
         // ================= CUSTOM SETUP & TIMING FEATURES =================
 
         window.openSetupModal = function(isRevisionMode = false) {
             isIncorrectRevisionMode = isRevisionMode;
             
             const limitSelect = document.getElementById("setup-q-limit");
-            const maxAvailable = isRevisionMode ? userIncorrectQuestions.length : questions.length;
+            
+            // যদি আগে থেকে ক্যাটাগরি কুইজ ফিল্টারড হয়ে থাকে, তবে সেটি ব্যবহার হবে, অন্যথায় র্যান্ডম মিক্সড
+            let maxAvailable = questions.length;
+            if(isRevisionMode) {
+                maxAvailable = userIncorrectQuestions.length;
+            } else if (activeQuizQuestions.length > 0 && activeQuizQuestions.length < questions.length) {
+                maxAvailable = activeQuizQuestions.length; 
+            } else {
+                activeQuizQuestions = [...questions]; 
+                maxAvailable = questions.length;
+            }
             
             limitSelect.innerHTML = "";
             const options = [5, 10, 20, 50];
@@ -1054,6 +1192,7 @@
 
         window.closeSetupModal = function() {
             document.getElementById("setup-modal").classList.add("hidden");
+            activeQuizQuestions = []; // ক্যানসেল করলে কুইজ অ্যারে ক্লিয়ার
         }
 
         window.startConfiguredQuiz = function() {
@@ -1067,7 +1206,7 @@
             if (isIncorrectRevisionMode) {
                 const incorrectIds = userIncorrectQuestions.map(item => item.questionId);
                 activeQuizQuestions = questions.filter(q => incorrectIds.includes(q.id));
-            } else {
+            } else if (activeQuizQuestions.length === 0) {
                 activeQuizQuestions = [...questions];
             }
 
@@ -1135,8 +1274,8 @@
 
         // ================= QUIZ SCREEN RUNTIME =================
 
-        function exitQuizToPortal() {
-            if (confirm("আপনি কি নিশ্চিতভাবে ড্যাশবোর্ডে ফিরে যেতে চান? আপনার বর্তমান প্রগ্রেস বাতিল হবে।")) {
+        window.exitQuizToPortal = function() {
+            if (confirm("আপনি কি নিশ্চিতভাবে ড্যাশবোর্ডে ফিরে যেতে চান? আপনার বর্তমান পরীক্ষার প্রগ্রেস বাতিল হবে।")) {
                 if (countdownTimer) clearInterval(countdownTimer);
                 document.getElementById("quiz-screen").classList.add("hidden");
                 document.getElementById("user-portal").classList.remove("hidden");
@@ -1223,7 +1362,6 @@
             const correctIndex = keys.indexOf(correctKey);
             const selectedIndex = keys.indexOf(selectedKey);
 
-            // ওএমআর ও উত্তর লগার
             userSelectedAnswersLog[currentQ.id] = {
                 questionText: currentQ.text,
                 selected: selectedKey,
@@ -1294,7 +1432,6 @@
             renderResultChart(correctAnswers, wrongAnswers);
 
             try {
-                // ১. গ্লোবাল লিডারবোর্ডে কুইজ আপডেট পাঠানো
                 await addDoc(collection(db, "leaderboard"), {
                     name: currentUser,
                     phone: currentUserPhone,
@@ -1302,7 +1439,6 @@
                     date: new Date()
                 });
 
-                // ২. আজীবন পরিসংখ্যান ফায়ারবেসে সরাসরি প্লাস করা
                 const userRef = doc(db, "users", currentUserPhone);
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
@@ -1316,7 +1452,6 @@
                     });
                 }
 
-                // ৩. ওএমআর আর্কাইভ বা এক্সাম হিস্ট্রি ফায়ারবেসে সেভ করা
                 await addDoc(collection(db, "exam_history"), {
                     username: currentUserPhone,
                     totalQuestions: activeQuizQuestions.length,
